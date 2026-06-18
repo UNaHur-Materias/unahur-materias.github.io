@@ -11,7 +11,7 @@ export default defineConfig({
     service: passthroughImageService()
   },
   site: 'https://UNAHur-Materias.github.io', // <-- Cambiala después por tu URL de Render si querés
-  base: '/repos',
+  base: '/',
   compressHTML: false,
   integrations: [
     mdx(), 
