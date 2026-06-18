@@ -150,7 +150,23 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		
+		"asignaciones": {
+"command.md": {
+	id: "command.md";
+  slug: "command";
+  body: string;
+  collection: "asignaciones";
+  data: any
+} & { render(): Render[".md"] };
+"template.md": {
+	id: "template.md";
+  slug: "template";
+  body: string;
+  collection: "asignaciones";
+  data: any
+} & { render(): Render[".md"] };
+};
+
 	};
 
 	type DataEntryMap = {

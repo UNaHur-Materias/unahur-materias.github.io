@@ -1,224 +1,73 @@
 ---
-import DefaultLayout from '@layouts/DefaultLayout.astro'
-import Hero from '@components/Hero.astro'
-import CardSecciones from '@/components/CardSecciones.astro'
-import { PATH_CURSADA } from '@/paths.js'
-import { Icon } from 'astro-icon/components'
+// src/pages/index.astro
+import { getCollection } from 'astro:content';
+import CardAsignacion from '../components/CardAsignacion.astro';
+import HeaderUni from '../components/HeaderUni.astro';
+
+const todasLasAsignaciones = await getCollection('asignaciones');
+const asignacionesActivas = todasLasAsignaciones.filter(asig => asig.data.active === true);
 ---
 
-<DefaultLayout
-	title="Objetos I"
-	description="Universidad Nacional de Hurlingham, materia Programación con Objetos I"
-	author="Objetos I">
-	<Hero />
-	<section class="my-64">
-		<div class="container">
-			<CardSecciones>
-				<h2 class="mb-15 text-center text-4xl sm:text-6xl">¡Bienvenido/a!</h2>
-				<p class="text-center">
-					Si llegaste hasta este sitio es muy probable que estes inscripto en
-					Programación con Objetos I, de la Licenciatura en Informática y/o
-					Tecnicatura en Programación de la Universidad Nacional de Hurlingham.
-					Aquí encontrarás casi todo lo necesario para tu cursada. Decimos casi
-					porque hay mucho material que “vive” en otras páginas, pero este sitio
-					funcionará como punto de partida para llegar allí.
+<html lang="es">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>UNAHUR - Instituto de Tecnología e Ingeniería</title>
+	<style>
+		body { 
+			font-family: system-ui, -apple-system, sans-serif; 
+			background-color: #0b0f19; 
+			color: #f1f5f9; 
+			margin: 0; 
+			padding: 2rem 1rem;
+		}
+		.container { 
+			max-width: 1000px; 
+			margin: 0 auto; 
+		}
+		h1 { 
+			font-size: 2.25rem;
+			font-weight: 800;
+			color: #ffffff; 
+			margin: 0 0 0.5rem 0; 
+			letter-spacing: -0.025em;
+		}
+		h1 span { color: #009bc3; }
+		.subtitle { 
+			color: #94a3b8; 
+			font-size: 1.05rem;
+			margin: 0;
+		}
+		.grid { 
+			display: grid; 
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+			gap: 2rem; 
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<!-- El Header recibe el bloque de títulos y los deja a la izquierda -->
+		<HeaderUni>
+			<h1>Asignaciones <span>Disponibles</span></h1>
+			<p class="subtitle">Entorno de gestión de repositorios y entregas de código.</p>
+		</HeaderUni>
+		
+		<main class="grid">
+			{asignacionesActivas.length > 0 ? (
+				asignacionesActivas.map(asig => (
+					<CardAsignacion 
+						title={asig.data.title} 
+						description={asig.data.description || asig.data.descripcion} 
+						slug={asig.slug} 
+					/>
+				))
+			) : (
+				<p style="grid-column: 1/-1; text-align: center; color: #64748b; background: #131926; padding: 3rem; border-radius: 12px; border: 1px dashed #1e293b;">
+					No hay asignaciones activas en este momento.
 				</p>
-				<p class="text-center">
-					Arrancamos el cuatrimestre con una modalidad de cursada mixta, donde
-					tendremos clases presenciales y virtuales. Hay que estar atento/a al <a
-						href="https://docs.google.com/spreadsheets/d/1sTX8bL4uZ4LkcCuH51qvWomDgz5cD9J3C9YACsE2tuk/edit?usp=sharing"
-						target="_blank"
-						>cronograma</a
-					> de la cursada por si en algún momento se hace algún cambio.
-				</p>
-				<p class="text-center">
-					Si ya viniste varias veces, probablemente quieras ir a la sección <a
-						href={PATH_CURSADA}>cursada</a
-					> o ver el <a href="/material">material</a> que tenemos disponible.
-				</p>
-				<p>
-					También vas a tener que instalarte Wollok y Git, si no lo hiciste aún.
-					En la sección <a href="/videos">Videos</a> encontrarás los tutoriales para
-					hacerlo.
-				</p>
-			</CardSecciones>
-
-			{
-				/* La sintaxis de los comentarios JS también es válida 
-
-			<div class="m-auto mt-6 text-center">
-				<p>
-					<b
-						>Antes de seguir, es imprescindible que completes el formulario de
-						inscripción que nos ayudará a organizar la cursada de la mejor
-						manera posible.</b
-					>
-				</p>
-				<a
-					class="button color-tertiary mt-3"
-					href="https://docs.google.com/forms/d/e/1FAIpQLSd5FuN_qImYgf8ZnfQEFUvDbZHvXFj_i0Pb0N-5UIdMEXZMfQ/viewform"
-					target="_blank"
-					>Ir al formulario</a
-				>
-			</div>
-			<br />
-			*/
-			}
-			<CardSecciones title="Datos de las cursada">
-				<ul>
-					<li>
-						Modalidad Mixta - <a
-							href="https://docs.google.com/spreadsheets/d/1sTX8bL4uZ4LkcCuH51qvWomDgz5cD9J3C9YACsE2tuk/edit?usp=sharing"
-							target="_blank"
-							>Cronograma de Clases</a
-						>
-					</li>
-					<li>
-						7 Comisiones pero es la misma materia y utilizamos la misma página.
-					</li>
-					<li>
-						Las clases serán de la siguiente forma según la comisión a la que
-						perteneces:
-					</li>
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 1:&nbsp</b> Todos los viernes de 8 a 12hs.(Presencial) y
-						todos los sábados de 10hs a 12hs. (Virtual). Prof. Ailin Merlo.
-					</li>
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 2:&nbsp</b> Todos los martes de 18 a 22hs.(Presencial) y
-						todos los sábados de 10hs a 12hs. (Virtual). Prof. Hernán Coniglio.
-					</li>
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 3:&nbsp</b> Todos los miércoles de 18 a 22hs.(Presencial)
-						y todos los sábados de 10hs a 12hs. (Virtual). Prof. Matías Müller.
-					</li>
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 4:&nbsp</b> Todos los viernes de 18 a 22hs.(Presencial) y
-						todos los sábados de 10hs a 12hs. (Virtual). Prof. Hernán Quiroga.
-					</li>
-
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 5:&nbsp</b> Todos los miércoles de 18 a 22hs.(Presencial)
-						y todos los sábados de 10hs a 12hs. (Virtual). Prof. Hernán Coniglio.
-					</li>
-
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 6:&nbsp</b> Todos los viernes de 18 a 22hs.(Presencial) y
-						todos los sábados de 10hs a 12hs. (Virtual). Prof. Gisela Tamburro.
-					</li>
-
-					<li class="flex items-center">
-						<Icon
-							name="ion:arrow-forward"
-							class="mr-2"
-						/>
-						<b>Comisión 7:&nbsp</b> Todos los viernes de 18 a 22hs.(Presencial) y
-						todos los sábados de 10hs a 12hs. (Virtual). Prof. Mauricio Pintos.
-					</li>
-
-					<li>
-						Nos acompañan como asistentes y colaboradores Cristian Gonzalez,
-						Juan Manuel Palacios, Ernesto Calzon Fabrizio, Agustin Olavarria,
-						Carolina Gonzalez Pisarello, Marcos Acuña, Matias Barrientos,
-						Santiago Elias Bravo, Sebastián Masatti y Erika Campos.
-					</li>
-				</ul>
-			</CardSecciones>
-			<CardSecciones title="Canales de comunicación">
-				<p>
-					Vamos a utilizar esta página para subir material, fechas importantes y
-					todo lo relacionado a la cursada. Tal vez sea una buena idea agregarla
-					a los favoritos de tu navegador.
-				</p>
-				<p class="text-left">
-					Para tener una comunicación más fluida vamos a utilizar un canal de <a
-						href="https://www.discordapp.com/">Discord</a
-					>.
-				</p>
-				<ul>
-					<li class="list-disc">
-						Si aún no tenes cuenta debes registrarte ingresando <a
-							href="https://www.discordapp.com/"
-							target="_blank"
-							>aquí</a
-						>
-					</li>
-					<li class="list-disc">
-						Una vez registrado y dentro de Discord, por única vez y si no lo
-						hiciste antes, debes entrar a este link y asegurarte de Aceptar la
-						invitación al servidor de la carrera <a
-							href="https://discord.gg/tqyHtPt"
-							target="_blank"
-							>InformaticaUNAHUR</a
-						>.
-					</li>
-					<li class="list-disc">
-						Luego, siguiendo este enlace: <a
-							href="https://discord.gg/XpP6kCTkFd"
-							target="_blank"
-							>matricularse-materias-discord</a
-						> podrás matricularte en los canales de las materias que estés cursando
-						reaccionando a la letra que corresponda a cada una. Para esta materia,
-						corresponde <b>(753) Programación de Objetos I</b>. Asegurate de
-						hacerlo solo 1 vez, ya que si le das varias veces click te vas a
-						desmatricular y no vas a poder ver los canales de la materia.
-					</li>
-				</ul>
-				<p class="text-left">
-					Aunque toda la comunicación sobre la materia irá apareciendo en esta
-					página, por si llegaste hasta acá desde un enlace externo a la Unahur,
-					te dejamos el link al <a
-						href="https://campus2026.unahur.edu.ar/login/index.php"
-						>campus de la Universidad</a
-					>. Es importante que también lo revises regularmente si sos estudiante
-					de esta Universidad.
-				</p>
-			</CardSecciones>
-		</div>
-	</section>
-</DefaultLayout>
-<style>
-	a {
-		color: var(--primary-300) !important;
-	}
-	p {
-		margin-top: 0.7rem;
-		margin-bottom: 0.7rem;
-	}
-	h2 {
-		margin-bottom: 1.5rem;
-	}
-
-	a {
-		transition: transform 0.2s ease-in-out;
-		cursor: pointer;
-	}
-
-	a:hover {
-		transform: scale(1.1);
-	}
-</style>
+			)}
+		</main>
+	</div>
+</body>
+</html>
