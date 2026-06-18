@@ -1,0 +1,302 @@
+---
+// src/components/TotpModal.astro
+---
+
+<div
+	id="totp-modal"
+	class="totp-modal-backdrop hidden">
+	<div
+		class="totp-modal-content"
+		id="totp-modal-content"
+		role="dialog"
+		aria-modal="true">
+		<div class="totp-modal-header">
+			<h3>🔐 Código del ejercicio</h3>
+			<button
+				id="totp-close"
+				class="totp-close-btn"
+				aria-label="Cerrar"
+				>&times;</button
+			>
+		</div>
+		<p class="totp-hint">
+			Ingresá el código temporal de 6 dígitos proyectado por el/la docente.
+		</p>
+
+		<div class="totp-input-container">
+			<input
+				type="text"
+				id="totp-input"
+				maxlength="6"
+				placeholder="000000"
+				autocomplete="off"
+			/>
+		</div>
+
+		<div
+			id="totp-error-box"
+			class="totp-error-box hidden">
+			<svg
+				class="totp-error-icon"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><circle
+					cx="12"
+					cy="12"
+					r="10"
+				></circle><line
+					x1="12"
+					y1="8"
+					x2="12"
+					y2="12"
+				></line><line
+					x1="12"
+					y1="16"
+					x2="12.01"
+					y2="16"
+				></line></svg
+			>
+			<span id="totp-error-text">Código incorrecto.</span>
+		</div>
+
+		<div class="totp-modal-actions">
+			<button
+				id="totp-cancel"
+				class="totp-btn-secondary"
+				>Cancelar</button
+			>
+			<button
+				id="totp-submit"
+				class="totp-btn-primary"
+				>Verificar</button
+			>
+		</div>
+	</div>
+</div>
+
+<style>
+	/* Variables heredadas para que matchee perfecto con los grupos */
+	#totp-modal {
+		--tm-accent: var(--action-color, #40bf6a);
+		--tm-accent-hover: var(--action-color-state, #17823b);
+		--tm-bg: var(--background, #fff);
+		--tm-bg-input: var(--neutral-background, #fafafa);
+		--tm-border: var(--neutral-400, #e6e6e6);
+		--tm-text: var(--font-color, #1a1a1a);
+		--tm-text-muted: var(--neutral-700, #595959);
+		--tm-radius: var(--radius-large, 6px);
+		--tm-font: var(--font-family-default, 'Open Sans', sans-serif);
+	}
+
+	.totp-modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(3px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 9999;
+		opacity: 1;
+		visibility: visible;
+		transition: opacity 0.25s ease, visibility 0.25s ease;
+	}
+	.totp-modal-backdrop.hidden {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
+	.totp-modal-content {
+		font-family: var(--tm-font);
+		background: var(--tm-bg);
+		color: var(--tm-text);
+		border: 3px solid var(--tm-accent);
+		border-radius: var(--tm-radius);
+		padding: 1.5rem;
+		max-width: 380px;
+		width: 90%;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+		transform: translateY(0);
+		transition: transform 0.2s ease;
+	}
+	.totp-modal-backdrop.hidden .totp-modal-content {
+		transform: translateY(6px);
+	}
+
+	.totp-modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 0.75rem;
+		border-bottom: 2px solid var(--tm-border);
+	}
+	.totp-modal-header h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		margin: 0;
+	}
+
+	.totp-close-btn {
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		line-height: 1;
+		cursor: pointer;
+		color: var(--tm-text-muted);
+		padding: 0.15rem 0.4rem;
+		border-radius: var(--tm-radius);
+		transition: all 0.15s ease;
+	}
+	.totp-close-btn:hover {
+		color: var(--tm-text);
+		background-color: var(--tm-border);
+	}
+
+	.totp-hint {
+		font-size: 0.9rem;
+		color: var(--tm-text-muted);
+		margin: 0;
+	}
+
+	.totp-input-container {
+		display: flex;
+		flex-direction: column;
+	}
+
+	#totp-input {
+		font-family: monospace;
+		font-size: 2rem;
+		font-weight: bold;
+		letter-spacing: 0.5rem;
+		text-align: center;
+		width: 100%;
+		padding: 0.75rem;
+		background: var(--tm-bg-input);
+		color: var(--tm-text);
+		border: 2px solid var(--tm-border);
+		border-radius: var(--tm-radius);
+		outline: none;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+	#totp-input:focus {
+		border-color: var(--tm-accent);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--tm-accent) 25%, transparent);
+	}
+
+	/* ✨ ESTILOS DEL ERROR (Se activan por JS) ✨ */
+	#totp-input.is-invalid {
+		border-color: #ef4444 !important;
+		box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+		background-color: #fef2f2;
+		color: #b91c1c;
+	}
+
+	.totp-error-box {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background-color: #fef2f2;
+		border: 1px solid #fca5a5;
+		color: #b91c1c;
+		padding: 0.7rem;
+		border-radius: calc(var(--tm-radius) - 2px);
+		font-size: 0.85rem;
+		font-weight: 600;
+		margin-top: -0.5rem;
+	}
+	.totp-error-box.hidden {
+		display: none;
+	}
+	.totp-error-icon {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	.totp-error-box svg {
+		width: 20px;
+		height: 20px;
+		flex-shrink: 0; /* Clave: evita que el ícono se deforme o aplaste si el texto del error ocupa más de una línea */
+	}
+
+	/* Animación para sacudir el modal */
+	.shake-anim {
+		animation: modal-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+	}
+	@keyframes modal-shake {
+		0%,
+		100% {
+			transform: translateX(0);
+		}
+		20%,
+		60% {
+			transform: translateX(-6px);
+		}
+		40%,
+		80% {
+			transform: translateX(6px);
+		}
+	}
+
+	.totp-modal-actions {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 0.5rem;
+	}
+
+	.totp-btn-primary,
+	.totp-btn-secondary {
+		flex: 1;
+		font-family: var(--tm-font);
+		font-size: 1rem;
+		font-weight: 700;
+		padding: 0.75rem 1rem;
+		border-radius: var(--tm-radius);
+		cursor: pointer;
+		text-align: center;
+		transition: all 0.15s ease;
+		line-height: 1;
+	}
+	.totp-btn-primary {
+		border: 3px solid var(--tm-accent);
+		background-color: var(--tm-accent);
+		color: var(--neutral-900, #1a1a1a);
+	}
+	.totp-btn-primary:hover {
+		background-color: var(--tm-accent-hover);
+		border-color: var(--tm-accent-hover);
+	}
+	.totp-btn-secondary {
+		border: 3px solid var(--tm-border);
+		background-color: var(--tm-bg-input);
+		color: var(--tm-text);
+	}
+	.totp-btn-secondary:hover {
+		background-color: var(--tm-border);
+	}
+
+	/* Adaptación al modo oscuro para que el error no encandile */
+	@media (prefers-color-scheme: dark) {
+		.totp-error-box {
+			background-color: rgba(239, 68, 68, 0.15);
+			border-color: rgba(239, 68, 68, 0.3);
+			color: #fca5a5;
+		}
+		#totp-input.is-invalid {
+			background-color: rgba(239, 68, 68, 0.05);
+			color: #fca5a5;
+		}
+	}
+</style>

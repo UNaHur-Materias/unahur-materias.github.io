@@ -1,0 +1,113 @@
+---
+import CardEjercicio from './CardEjercicio.astro'
+import CardSecciones from './CardSecciones.astro'
+
+const { ejercicios } = Astro.props
+const ejerciciosVisibles =
+	ejercicios?.filter((ej) => ej.visible !== false) || []
+---
+
+{
+	ejerciciosVisibles?.length > 0 && (
+		<CardSecciones
+			title="Ejercicios"
+			id="ejercicios">
+			<div class="github-user-container">
+				<input
+					type="text"
+					placeholder="Ingresá tu usuario de GitHub"
+					class="github-user-input"
+				/>
+			</div>
+
+			<ul class="m-auto">
+				{ejerciciosVisibles ? (
+					ejerciciosVisibles.map(
+						({
+							name,
+							urlTemplate,
+							destOrg,
+							prefix,
+							isPrivate,
+							type,
+							comentarios,
+							ejemploUrl,
+							obligatorio,
+							consultas,
+							fechaDeEntrega,
+							requireTOTP,
+							totpSecret,
+						}) => (
+							<li class="flex w-full justify-center">
+								<CardEjercicio
+									title={name}
+									urlTemplate={urlTemplate}
+									destOrg={destOrg}
+									prefix={prefix}
+									isPrivate={isPrivate}
+									type={type}
+									comentarios={comentarios}
+									ejemploUrl={ejemploUrl}
+									obligatorio={obligatorio}
+									consultas={consultas}
+									fechaDeEntrega={fechaDeEntrega}
+									requireTOTP={requireTOTP}
+									totpSecret={totpSecret}
+								/>
+							</li>
+						)
+					)
+				) : (
+					<p class="m-auto flex w-full">
+						<strong>Esta semana no hay ejercicios</strong>
+					</p>
+				)}
+			</ul>
+		</CardSecciones>
+	)
+}
+
+<style lang="scss">
+	ul {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-gap: 1rem;
+		justify-items: center;
+
+		@media (min-width: 550px) {
+			grid-template-columns: repeat(1, 1fr);
+		}
+
+		@media (min-width: 950px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	.github-user-container {
+		display: flex;
+		justify-content: center;
+		margin: 1rem 0 2rem 0;
+	}
+
+	.github-user-input {
+		width: 320px;
+		max-width: 90%;
+		padding: 10px 14px;
+		border-radius: 10px;
+		border: 2px solid var(--neutral-700);
+		background-color: var(--neutral-100);
+		color: var(--neutral-900);
+		text-align: center;
+		font-size: 1rem;
+	}
+
+	.github-user-input::placeholder {
+		color: var(--neutral-500);
+	}
+
+	:global(.darkmode) .github-user-input {
+		background-color: var(--dark-100);
+		color: var(--dark-900);
+		border-color: var(--dark-300);
+	}
+</style>

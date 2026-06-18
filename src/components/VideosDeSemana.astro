@@ -1,0 +1,19 @@
+---
+import CardSecciones from './CardSecciones.astro'
+import WatchVideo from './WatchVideo.astro'
+
+const { videos, titulo } = Astro.props
+---
+
+<CardSecciones
+	title={titulo}
+	id="videos">
+	{
+		videos.map((video) => (
+			<WatchVideo
+				title={video.nombre}
+				urlYoutube={video.urlYoutube}
+			/>
+		))
+	}
+</CardSecciones>

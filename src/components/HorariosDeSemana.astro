@@ -1,0 +1,33 @@
+---
+import CardHorario from './CardHorario.astro'
+import CardSecciones from './CardSecciones.astro'
+import TablaComisiones from './TablaComisiones.astro'
+
+const { horarios } = Astro.props
+---
+
+<CardSecciones title="Horarios">
+	{
+		/* Cards anteriores, una por cada comisión ↓
+	<ul>
+		{
+			horarios.map((horario) => (
+				<li>
+					<CardHorario
+						mensaje={horario.Mensaje}
+						comision={horario.Comision}
+						modalidad={horario.Modalidad}
+						dia={horario.Dia}
+						hora={horario.Hora}
+						url={horario.URL}
+						aula={horario.Aula}
+						edificio={horario.Edificio}
+					/>
+				</li>
+			))
+		}
+	</ul>
+	Tabla ordenable nueva ↓ */
+	}
+	<TablaComisiones horarios={horarios} />
+</CardSecciones>
