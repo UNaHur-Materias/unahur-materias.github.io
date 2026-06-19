@@ -9,13 +9,8 @@
 		const ERROR_TEXT = '✗ Error, intentá de nuevo';
 		const ACCEPTED_TEXT = 'Aceptado. Ir al repo →';
 
-		const getInput = () => document.querySelector('.github-user-input');
-		
-		const syncInput = () => {
-			const input = getInput();
-			const saved = localStorage.getItem('githubUser');
-			if (input && saved) input.value = saved;
-		};
+		// 👇 MODIFICADO: Ahora obtenemos el usuario directamente del login automático
+		const obtenerUsuarioLogueado = () => localStorage.getItem('gh_username');
 
 		const ACCEPTED_KEY = 'acceptedAssignments';
 		const assignments = {
@@ -42,14 +37,8 @@
 		};
 
 		// Eventos de ciclo de vida de Astro
-		document.addEventListener('DOMContentLoaded', () => { syncInput(); updateAcceptedButtons(); });
-		document.addEventListener('astro:page-load', () => { syncInput(); updateAcceptedButtons(); });
-
-		document.addEventListener('input', (e) => {
-			if (e.target.classList.contains('github-user-input')) {
-				localStorage.setItem('githubUser', e.target.value.trim());
-			}
-		});
+		document.addEventListener('DOMContentLoaded', () => { updateAcceptedButtons(); });
+		document.addEventListener('astro:page-load', () => { updateAcceptedButtons(); });
 
 		const hideTotpModal = () => {
 			document.getElementById('totp-modal')?.classList.add('hidden');
@@ -125,7 +114,6 @@
 			let codigoActual = body.totpCode
 
 			while (true) {
-				// 👇 AGREGÁ ESTA LÍNEA DE LOG ACÁ:
 				console.log("👉 POLTERGEIST DETECTED - BODY ENVIADO:", { ...body, totpCode: codigoActual });
 
 				const res = await fetch(WORKER_URL, {
@@ -159,9 +147,9 @@
 			if (!btn) return;
 			e.preventDefault();
 
-			const input = getInput();
-			let usuario = input?.value?.trim() || localStorage.getItem('githubUser');
-			if (!usuario) { alert('Ingresá tu usuario de GitHub'); return; }
+			// 👇 MODIFICADO: Obtenemos el usuario validado de la sesión automática
+			let usuario = obtenerUsuarioLogueado();
+			if (!usuario) { alert('No se detectó una sesión activa de GitHub. Por favor, recargá la página.'); return; }
 
 			const totpCode = await askTotpCode(btn);
 			if (totpCode === null && btn.getAttribute('data-require-totp') === 'true') return;

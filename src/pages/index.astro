@@ -1,73 +1,493 @@
 ---
 // src/pages/index.astro
-import { getCollection } from 'astro:content';
-import CardAsignacion from '../components/CardAsignacion.astro';
-import HeaderUni from '../components/HeaderUni.astro';
+import { getCollection } from "astro:content";
+import HeaderUni from "../components/HeaderUni.astro";
 
-const todasLasAsignaciones = await getCollection('asignaciones');
-const asignacionesActivas = todasLasAsignaciones.filter(asig => asig.data.active === true);
+const todasLasAsignaciones = await getCollection("asignaciones");
 ---
 
 <html lang="es">
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>UNAHUR - Instituto de Tecnología e Ingeniería</title>
-	<style>
-		body { 
-			font-family: system-ui, -apple-system, sans-serif; 
-			background-color: #0b0f19; 
-			color: #f1f5f9; 
-			margin: 0; 
-			padding: 2rem 1rem;
-		}
-		.container { 
-			max-width: 1000px; 
-			margin: 0 auto; 
-		}
-		h1 { 
-			font-size: 2.25rem;
-			font-weight: 800;
-			color: #ffffff; 
-			margin: 0 0 0.5rem 0; 
-			letter-spacing: -0.025em;
-		}
-		h1 span { color: #009bc3; }
-		.subtitle { 
-			color: #94a3b8; 
-			font-size: 1.05rem;
-			margin: 0;
-		}
-		.grid { 
-			display: grid; 
-			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-			gap: 2rem; 
-		}
-	</style>
-</head>
-<body>
-	<div class="container">
-		<!-- El Header recibe el bloque de títulos y los deja a la izquierda -->
-		<HeaderUni>
-			<h1>Asignaciones <span>Disponibles</span></h1>
-			<p class="subtitle">Entorno de gestión de repositorios y entregas de código.</p>
-		</HeaderUni>
-		
-		<main class="grid">
-			{asignacionesActivas.length > 0 ? (
-				asignacionesActivas.map(asig => (
-					<CardAsignacion 
-						title={asig.data.title} 
-						description={asig.data.description || asig.data.descripcion} 
-						slug={asig.slug} 
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Panel de Asignaciones - UNAHUR</title>
+		<style>
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+				background-color: #0b0f19;
+				color: #f1f5f9;
+				margin: 0;
+				padding: 2rem 1rem;
+			}
+			.container {
+				max-width: 850px;
+				margin: 0 auto;
+			}
+
+			/* --- CABECERA CORREGIDA Y DISTRIBUIDA HORIZONTALMENTE --- */
+			.header-container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 3rem;
+				gap: 2rem;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				padding-bottom: 1.5rem;
+			}
+
+			.header-title-block {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			h1 {
+				font-size: 2.4rem;
+				color: #ffffff;
+				margin: 0;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+			}
+
+			/* El "Disponibles" en Celeste */
+			h1 span.celeste {
+				color: #00a3e0;
+			}
+
+			/* Subtítulo naranja ITI justo debajo */
+			h2 {
+				font-size: 1rem;
+				color: #ff9e1b;
+				margin: 0;
+				font-weight: 400;
+				letter-spacing: -0.01em;
+				opacity: 0.9;
+			}
+
+			/* --- TOPBAR PERFIL DE USUARIO --- */
+			.top-profile-bar {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				background: #111726;
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				padding: 0.5rem 1rem;
+				border-radius: 30px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+			.user-avatar {
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				border: 2px solid #70b043;
+			}
+			.btn-logout {
+				background: transparent;
+				color: #94a3b8;
+				border: none;
+				padding: 0;
+				margin-left: 0.5rem;
+				cursor: pointer;
+				font-size: 0.85rem;
+				text-decoration: underline;
+				font-weight: 500;
+			}
+			.btn-logout:hover {
+				color: #f43f5e;
+			}
+
+			/* --- TARJETA DE LOGIN CENTRAL --- */
+			.login-card {
+				max-width: 500px;
+				margin: 4rem auto;
+				background: #111726;
+				border: 1px dashed rgba(255, 255, 255, 0.15);
+				padding: 2.5rem;
+				border-radius: 16px;
+				text-align: center;
+				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+			}
+			.btn-github-login {
+				background: #ffffff;
+				color: #0b0f19;
+				font-weight: 700;
+				border: none;
+				padding: 12px 24px;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 0.95rem;
+				transition: background 0.2s;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				text-decoration: none;
+			}
+			.btn-github-login:hover {
+				background: #e2e8f0;
+			}
+
+			/* --- GRILLA DE MATERIAS --- */
+			.subjects-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+				gap: 1.5rem;
+				margin-top: 2rem;
+			}
+			.subject-card {
+				background: #111726;
+				padding: 1.75rem;
+				border-radius: 12px;
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				color: #fff;
+				text-decoration: none;
+				font-weight: 700;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				transition: all 0.2s ease;
+			}
+			.subject-card:hover {
+				border-color: #70b043;
+				transform: translateY(-2px);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header class="header-container">
+				<div class="header-title-block">
+					<h1>
+						Asignaciones <span class="celeste">Disponibles</span>
+					</h1>
+					<h2>
+						Entorno de gestión de repositorios y entregas de código.
+					</h2>
+				</div>
+
+				<HeaderUni />
+
+				<div
+					id="top-profile-container"
+					style="display: none;"
+					class="top-profile-bar"
+				>
+					<img
+						id="user-avatar-top"
+						src=""
+						alt="Avatar"
+						class="user-avatar"
 					/>
-				))
-			) : (
-				<p style="grid-column: 1/-1; text-align: center; color: #64748b; background: #131926; padding: 3rem; border-radius: 12px; border: 1px dashed #1e293b;">
-					No hay asignaciones activas en este momento.
-				</p>
-			)}
-		</main>
-	</div>
-</body>
+					<span
+						id="user-name-top"
+						style="font-size: 0.9rem; font-weight: 600; color: #fff;"
+					></span>
+					<button type="button" id="btn-logout-gh" class="btn-logout"
+						>Salir</button
+					>
+				</div>
+			</header>
+
+			<main id="main-content">
+				<div id="auth-gate-zone" style="display: none;">
+					<div class="login-card">
+						<div id="login-state-start">
+							<h3
+								style="margin: 0 0 0.5rem 0; color: #fff; font-size: 1.4rem;"
+							>
+								Acceso Restringido
+							</h3>
+							<p
+								style="color: #94a3b8; font-size: 0.9rem; margin: 0 0 1.5rem 0; line-height: 1.5;"
+							>
+								Para visualizar las materias asignadas y
+								descargar tus ejercicios, por favor vinculá tu
+								cuenta.
+							</p>
+							<button
+								type="button"
+								id="btn-login-gh"
+								class="btn-github-login"
+								style="cursor: pointer;"
+							>
+								Loguearse con GitHub
+							</button>
+						</div>
+
+						<div id="login-state-code" style="display: none;">
+							<h3
+								style="margin: 0 0 0.5rem 0; color: #fff; font-size: 1.4rem;"
+							>
+								¡Código Generado!
+							</h3>
+							<p
+								style="color: #94a3b8; font-size: 0.9rem; margin: 0 0 1.5rem 0;"
+							>
+								Copiá el código de abajo y pegalo en la ventana
+								de GitHub que se va a abrir:
+							</p>
+
+							<div
+								id="display-user-code"
+								style="background: #0b0f19; color: #70b043; font-family: monospace; font-size: 1.75rem; font-weight: 800; padding: 1rem; border-radius: 8px; border: 1px solid rgba(112, 176, 67, 0.3); margin-bottom: 1.5rem; letter-spacing: 2px;"
+							>
+								-----
+							</div>
+
+							<button
+								type="button"
+								id="btn-copy-and-go"
+								class="btn-github-login"
+								style="background: #70b043; color: #fff; width: 100%;"
+							>
+								Copiar código e ir a GitHub 📋
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div
+					id="subjects-zone"
+					style="display: none;"
+					class="subjects-grid"
+				>
+					{
+						todasLasAsignaciones.map((asig) => (
+							<a href={`/${asig.slug}`} class="subject-card">
+								<span>{asig.data.title}</span>
+								<span style="color: #70b043;">→</span>
+							</a>
+						))
+					}
+				</div>
+			</main>
+		</div>
+
+		<script is:inline>
+			document.addEventListener("DOMContentLoaded", () => {
+				const CLIENT_ID = "Ov23liWzS33fUAJ8vbi6";
+				const PROXY = "https://corsproxy.io/?";
+
+				const profileContainer = document.getElementById(
+					"top-profile-container",
+				);
+				const userNameTop = document.getElementById("user-name-top");
+				const userAvatarTop =
+					document.getElementById("user-avatar-top");
+
+				const authGateZone = document.getElementById("auth-gate-zone");
+				const subjectsZone = document.getElementById("subjects-zone");
+
+				const btnLogin = document.getElementById("btn-login-gh");
+				const btnLogout = document.getElementById("btn-logout-gh");
+
+				const loginStateStart =
+					document.getElementById("login-state-start");
+				const loginStateCode =
+					document.getElementById("login-state-code");
+				const displayUserCode =
+					document.getElementById("display-user-code");
+				const btnCopyAndGo = document.getElementById("btn-copy-and-go");
+
+				const savedUser = localStorage.getItem("gh_username");
+
+				// Comprobación de estado inicial de sesión
+				if (savedUser) {
+					if (userNameTop) userNameTop.textContent = `@${savedUser}`;
+					if (userAvatarTop)
+						userAvatarTop.src = `https://github.com/${savedUser}.png`;
+					if (profileContainer)
+						profileContainer.style.display = "flex";
+					if (subjectsZone) subjectsZone.style.display = "grid";
+					if (authGateZone) authGateZone.style.display = "none";
+				} else {
+					if (authGateZone) authGateZone.style.display = "block";
+					if (subjectsZone) subjectsZone.style.display = "none";
+				}
+
+				btnLogin?.addEventListener("click", async () => {
+					btnLogin.disabled = true;
+					btnLogin.textContent = "Generando código...";
+					try {
+						const response = await fetch(
+							PROXY +
+								encodeURIComponent(
+									"https://github.com/login/device/code",
+								),
+							{
+								method: "POST",
+								headers: {
+									Accept: "application/json",
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify({
+									client_id: CLIENT_ID,
+									scope: "read:user",
+								}),
+							},
+						);
+
+						const data = await response.json();
+						const {
+							device_code,
+							user_code,
+							verification_uri,
+							interval,
+						} = data;
+
+						if (displayUserCode)
+							displayUserCode.textContent = user_code;
+						if (loginStateStart)
+							loginStateStart.style.display = "none";
+						if (loginStateCode)
+							loginStateCode.style.display = "block";
+
+						btnCopyAndGo?.addEventListener("click", () => {
+							navigator.clipboard
+								.writeText(user_code)
+								.then(() => {
+									btnCopyAndGo.textContent =
+										"¡Copiado! Abriendo GitHub...";
+									btnCopyAndGo.style.background = "#009bc3";
+									setTimeout(() => {
+										window.open(verification_uri, "_blank");
+									}, 400);
+								});
+						});
+
+						let currentInterval = (interval || 5) * 1000;
+						let pollTimeout;
+
+						async function pollForToken() {
+							try {
+								const pollResponse = await fetch(
+									PROXY +
+										encodeURIComponent(
+											"https://github.com/login/oauth/access_token",
+										),
+									{
+										method: "POST",
+										headers: {
+											Accept: "application/json",
+											"Content-Type": "application/json",
+										},
+										body: JSON.stringify({
+											client_id: CLIENT_ID,
+											device_code: device_code,
+											grant_type:
+												"urn:ietf:params:oauth:grant-type:device_code",
+										}),
+									},
+								);
+								const tokenData = await pollResponse.json();
+
+								if (tokenData.access_token) {
+									console.log(
+										"¡Token recibido con éxito!",
+										tokenData.access_token,
+									);
+
+									try {
+										const userResponse = await fetch(
+											PROXY +
+												encodeURIComponent(
+													"https://api.github.com/user",
+												),
+											{
+												headers: {
+													Authorization: `Bearer ${tokenData.access_token}`,
+													Accept: "application/json",
+												},
+											},
+										);
+
+										if (userResponse.ok) {
+											const userData =
+												await userResponse.json();
+											if (userData && userData.login) {
+												localStorage.setItem(
+													"gh_username",
+													userData.login,
+												);
+												localStorage.setItem(
+													"gh_token",
+													tokenData.access_token,
+												);
+												window.location.reload();
+												return;
+											}
+										}
+										throw new Error("Perfil inaccesible");
+									} catch (userErr) {
+										console.warn(
+											"Usando plan B por bloqueo de proxy...",
+											userErr,
+										);
+										localStorage.setItem(
+											"gh_username",
+											"Alumno_UNAHUR",
+										);
+										localStorage.setItem(
+											"gh_token",
+											tokenData.access_token,
+										);
+										window.location.reload();
+										return;
+									}
+								}
+
+								if (tokenData.error === "slow_down") {
+									currentInterval += 5000;
+									console.log(
+										`GitHub pidió slow_down. Aumentando intervalo a ${currentInterval / 1000}s`,
+									);
+								} else if (
+									tokenData.error === "expired_token" ||
+									tokenData.error === "access_denied"
+								) {
+									alert(
+										"El tiempo expiró o cancelaste el acceso en GitHub. Por favor, reintentá.",
+									);
+									window.location.reload();
+									return;
+								} else {
+									console.log(
+										"Esperando autorización en GitHub...",
+										tokenData.error,
+									);
+								}
+
+								pollTimeout = setTimeout(
+									pollForToken,
+									currentInterval,
+								);
+							} catch (pollErr) {
+								console.error("Error en el polling:", pollErr);
+								pollTimeout = setTimeout(
+									pollForToken,
+									currentInterval,
+								);
+							}
+						}
+
+						pollTimeout = setTimeout(pollForToken, currentInterval);
+					} catch (err) {
+						console.error(err);
+						alert("Ocurrió un error al intentar la conexión.");
+						btnLogin.disabled = false;
+						btnLogin.textContent = "Loguearse con GitHub";
+					}
+				});
+
+				btnLogout?.addEventListener("click", () => {
+					localStorage.removeItem("gh_username");
+					localStorage.removeItem("gh_token");
+					window.location.reload();
+				});
+			});
+		</script>
+	</body>
 </html>
