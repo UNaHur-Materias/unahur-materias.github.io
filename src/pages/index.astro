@@ -2,8 +2,25 @@
 // src/pages/index.astro
 import { getCollection } from "astro:content";
 import HeaderUni from "../components/HeaderUni.astro";
+import UserProfile from "@/components/UserProfile.astro";
 
 const todasLasAsignaciones = await getCollection("asignaciones");
+
+// [CORRECCIÓN] Filtramos para que SOLO pasen las asignaciones que no tengan active: false
+const asignacionesVisibles = todasLasAsignaciones.filter(
+	(asig) => asig.data.active !== false,
+);
+
+// Helper para formatear la fecha de publicación en el listado principal
+const formatearFecha = (fecha: string | Date) => {
+	if (!fecha) return null;
+	return new Date(fecha).toLocaleDateString("es-AR", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+};
 ---
 
 <html lang="es">
@@ -27,7 +44,7 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				margin: 0 auto;
 			}
 
-			/* --- CABECERA CORREGIDA Y DISTRIBUIDA HORIZONTALMENTE --- */
+			/* --- CABECERA --- */
 			.header-container {
 				display: flex;
 				justify-content: space-between;
@@ -52,12 +69,10 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				letter-spacing: -0.02em;
 			}
 
-			/* El "Disponibles" en Celeste */
 			h1 span.celeste {
 				color: #00a3e0;
 			}
 
-			/* Subtítulo naranja ITI justo debajo */
 			h2 {
 				font-size: 1rem;
 				color: #ff9e1b;
@@ -65,38 +80,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				font-weight: 400;
 				letter-spacing: -0.01em;
 				opacity: 0.9;
-			}
-
-			/* --- TOPBAR PERFIL DE USUARIO --- */
-			.top-profile-bar {
-				display: flex;
-				align-items: center;
-				gap: 0.75rem;
-				background: #111726;
-				border: 1px solid rgba(255, 255, 255, 0.05);
-				padding: 0.5rem 1rem;
-				border-radius: 30px;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			}
-			.user-avatar {
-				width: 32px;
-				height: 32px;
-				border-radius: 50%;
-				border: 2px solid #70b043;
-			}
-			.btn-logout {
-				background: transparent;
-				color: #94a3b8;
-				border: none;
-				padding: 0;
-				margin-left: 0.5rem;
-				cursor: pointer;
-				font-size: 0.85rem;
-				text-decoration: underline;
-				font-weight: 500;
-			}
-			.btn-logout:hover {
-				color: #f43f5e;
 			}
 
 			/* --- TARJETA DE LOGIN CENTRAL --- */
@@ -129,12 +112,39 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				background: #e2e8f0;
 			}
 
+			/* --- CONTROLES DE PANELES --- */
+			.panel-controls {
+				display: flex;
+				justify-content: flex-end;
+				margin-top: -1.5rem;
+				margin-bottom: 1.5rem;
+			}
+
+			.btn-history-action {
+				background: rgba(255, 158, 27, 0.07);
+				color: #ff9e1b;
+				border: 1px solid rgba(255, 158, 27, 0.2);
+				padding: 0.5rem 1rem;
+				border-radius: 8px;
+				font-size: 0.75rem;
+				font-weight: 700;
+				text-decoration: none;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				transition: all 0.2s ease;
+			}
+
+			.btn-history-action:hover {
+				background: #ff9e1b;
+				color: #0b0f19;
+				border-color: #ff9e1b;
+			}
+
 			/* --- GRILLA DE MATERIAS --- */
 			.subjects-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 				gap: 1.5rem;
-				margin-top: 2rem;
 			}
 			.subject-card {
 				background: #111726;
@@ -143,16 +153,38 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				border: 1px solid rgba(255, 255, 255, 0.05);
 				color: #fff;
 				text-decoration: none;
-				font-weight: 700;
 				display: flex;
-				justify-content: space-between;
-				align-items: center;
+				flex-direction: column;
+				gap: 0.75rem;
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 				transition: all 0.2s ease;
 			}
 			.subject-card:hover {
 				border-color: #70b043;
 				transform: translateY(-2px);
+			}
+
+			.card-body {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+			}
+			.card-title {
+				font-weight: 700;
+				font-size: 1.05rem;
+			}
+
+			/* [NUEVO] Estilo sutil para la fecha de publicación en el Home */
+			.card-date {
+				font-size: 0.75rem;
+				color: #64748b;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 0.02em;
+				border-top: 1px solid rgba(255, 255, 255, 0.03);
+				padding-top: 0.5rem;
+				margin-top: auto;
 			}
 		</style>
 	</head>
@@ -170,28 +202,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				</div>
 
 				<HeaderUni />
-
-				<div
-					id="top-profile-container"
-					style="display: none;"
-					class="top-profile-bar"
-				>
-					<img
-						id="user-avatar-top"
-						src=""
-						alt="Avatar"
-						class="user-avatar"
-					/>
-					<br />
-					<span
-						id="user-name-top"
-						style="font-size: 0.9rem; font-weight: 600; color: #fff;"
-					></span>
-					<br />
-					<button type="button" id="btn-logout-gh" class="btn-logout"
-						>Salir</button
-					>
-				</div>
 			</header>
 
 			<main id="main-content">
@@ -214,7 +224,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 								type="button"
 								id="btn-login-gh"
 								class="btn-github-login"
-								style="cursor: pointer;"
 							>
 								Loguearse con GitHub
 							</button>
@@ -252,19 +261,51 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 					</div>
 				</div>
 
-				<div
-					id="subjects-zone"
-					style="display: none;"
-					class="subjects-grid"
-				>
-					{
-						todasLasAsignaciones.map((asig) => (
-							<a href={`/${asig.slug}`} class="subject-card">
-								<span>{asig.data.title}</span>
-								<span style="color: #70b043;">→</span>
-							</a>
-						))
-					}
+				<UserProfile />
+
+				<div id="subjects-zone" style="display: none;">
+					<div class="panel-controls">
+						<a
+							href="/historial"
+							id="btn-historial-link"
+							class="btn-history-action"
+						>
+							Ver Historial →
+						</a>
+					</div>
+
+					<div class="subjects-grid">
+						{
+							// [CORRECCIÓN] Usamos el array filtrado 'asignacionesVisibles'
+							asignacionesVisibles.map((asig) => {
+								const fechaPub = formatearFecha(
+									asig.data.fechaPublicacion,
+								);
+
+								return (
+									<a
+										href={`/asignaciones/${asig.slug}`}
+										class="subject-card"
+									>
+										<div class="card-body">
+											<span class="card-title">
+												{asig.data.title}
+											</span>
+											<span style="color: #70b043;">
+												→
+											</span>
+										</div>
+										{/* [NUEVO] Si tiene fecha de publicación, la renderizamos abajo */}
+										{fechaPub && (
+											<span class="card-date">
+												Publicado: {fechaPub}
+											</span>
+										)}
+									</a>
+								);
+							})
+						}
+					</div>
 				</div>
 			</main>
 		</div>
@@ -274,18 +315,9 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				const CLIENT_ID = "Ov23liWzS33fUAJ8vbi6";
 				const PROXY = "https://corsproxy.io/?";
 
-				const profileContainer = document.getElementById(
-					"top-profile-container",
-				);
-				const userNameTop = document.getElementById("user-name-top");
-				const userAvatarTop =
-					document.getElementById("user-avatar-top");
-
 				const authGateZone = document.getElementById("auth-gate-zone");
 				const subjectsZone = document.getElementById("subjects-zone");
-
 				const btnLogin = document.getElementById("btn-login-gh");
-				const btnLogout = document.getElementById("btn-logout-gh");
 
 				const loginStateStart =
 					document.getElementById("login-state-start");
@@ -296,19 +328,19 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 				const btnCopyAndGo = document.getElementById("btn-copy-and-go");
 
 				const savedUser = localStorage.getItem("gh_username");
+				const btnHistorialLink =
+					document.getElementById("btn-historial-link");
 
-				// Comprobación de estado inicial de sesión
 				if (savedUser) {
-					if (userNameTop) userNameTop.textContent = `@${savedUser}`;
-					if (userAvatarTop)
-						userAvatarTop.src = `https://github.com/${savedUser}.png`;
-					if (profileContainer)
-						profileContainer.style.display = "flex";
-					if (subjectsZone) subjectsZone.style.display = "grid";
+					if (subjectsZone) subjectsZone.style.display = "block";
 					if (authGateZone) authGateZone.style.display = "none";
+					if (btnHistorialLink)
+						btnHistorialLink.style.display = "inline-block";
 				} else {
 					if (authGateZone) authGateZone.style.display = "block";
 					if (subjectsZone) subjectsZone.style.display = "none";
+					if (btnHistorialLink)
+						btnHistorialLink.style.display = "none";
 				}
 
 				btnLogin?.addEventListener("click", async () => {
@@ -388,11 +420,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 								const tokenData = await pollResponse.json();
 
 								if (tokenData.access_token) {
-									console.log(
-										"¡Token recibido con éxito!",
-										tokenData.access_token,
-									);
-
 									try {
 										const userResponse = await fetch(
 											PROXY +
@@ -444,23 +471,15 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 
 								if (tokenData.error === "slow_down") {
 									currentInterval += 5000;
-									console.log(
-										`GitHub pidió slow_down. Aumentando intervalo a ${currentInterval / 1000}s`,
-									);
 								} else if (
 									tokenData.error === "expired_token" ||
 									tokenData.error === "access_denied"
 								) {
 									alert(
-										"El tiempo expiró o cancelaste el acceso en GitHub. Por favor, reintentá.",
+										"El tiempo expiró o cancelaste el acceso. Reintentá.",
 									);
 									window.location.reload();
 									return;
-								} else {
-									console.log(
-										"Esperando autorización en GitHub...",
-										tokenData.error,
-									);
 								}
 
 								pollTimeout = setTimeout(
@@ -468,7 +487,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 									currentInterval,
 								);
 							} catch (pollErr) {
-								console.error("Error en el polling:", pollErr);
 								pollTimeout = setTimeout(
 									pollForToken,
 									currentInterval,
@@ -483,12 +501,6 @@ const todasLasAsignaciones = await getCollection("asignaciones");
 						btnLogin.disabled = false;
 						btnLogin.textContent = "Loguearse con GitHub";
 					}
-				});
-
-				btnLogout?.addEventListener("click", () => {
-					localStorage.removeItem("gh_username");
-					localStorage.removeItem("gh_token");
-					window.location.reload();
 				});
 			});
 		</script>

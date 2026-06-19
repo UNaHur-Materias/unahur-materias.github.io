@@ -1,7 +1,8 @@
 ---
 title: "Semana 11 - Clases y Herencia"
 description: "Profundización en Clases y Herencia. Práctica para el segundo parcial."
-active: false
+fechaPublicacion: 2026-06-15
+active: true
 
 ejercicios:
   - name: "TP grupal integrador Wollok Game"

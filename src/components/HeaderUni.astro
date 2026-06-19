@@ -4,50 +4,33 @@ const { pageTitle } = Astro.props;
 ---
 
 <header class="navbar-uni">
-	<!-- El título de la página ahora vive a la izquierda -->
 	<div class="title-section">
 		<slot />
-		<!-- Permite inyectar HTML complejo como los spans de colores de la Home -->
 	</div>
 
-	<!-- El bloque de marca compactado a la derecha -->
-	<div class="brand-wrapper">
-		<div class="logo-container">
-			<img
-				src="/UNAHUR-LOGO.png"
-				alt="Universidad Nacional de Hurlingham"
-				class="logo-uni"
-				onerror="this.style.display='none'"
-			/>
-		</div>
-		<!-- <div class="iti-text">
-			UNAHUR-ITI
-		</div> -->
+	<div class="logo-container">
+		<img
+			src="/UNAHUR-LOGO.png"
+			alt="Universidad Nacional de Hurlingham"
+			class="logo-uni"
+			onerror="this.style.display='none'"
+		/>
 	</div>
 </header>
 
 <style>
 	.navbar-uni {
 		display: flex;
-		justify-content: space-between; /* Título a la izquierda, logo a la derecha */
+		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		/* border-bottom: 1px solid rgba(255, 255, 255, 0.05); */
 		padding-bottom: 2rem;
-		margin-bottom: 3rem;
+		margin-bottom: 2rem; /* Bajado para dejar espacio a la barra horizontal abajo */
 		gap: 2rem;
 	}
 
 	.title-section {
 		flex: 1;
-	}
-
-	.brand-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		width: 140px; /* Reducido para que sea más compacto */
-		flex-shrink: 0; /* Evita que el título lo aplaste */
 	}
 
 	.logo-container {
@@ -57,40 +40,28 @@ const { pageTitle } = Astro.props;
 		border-radius: 12px;
 		backdrop-filter: blur(8px);
 		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-		width: 100%;
+		width: 120px;
+		flex-shrink: 0;
 		box-sizing: border-box;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		margin-bottom: 0.5rem;
 	}
 
 	.logo-uni {
 		width: 100%;
 		height: auto;
-		max-width: 110px; /* Logo más chico */
+		max-width: 95px;
 		filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.05));
 	}
 
-	.iti-text {
-		color: #f39200;
-		font-size: 0.65rem; /* Letra del ITI más chica y armónica */
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		line-height: 1.3;
-		width: 100%;
-		word-wrap: break-word;
-	}
-
-	/* Responsive básico por si lo miran desde el celu */
 	@media (max-width: 600px) {
 		.navbar-uni {
 			flex-direction: column-reverse;
 			text-align: center;
 			gap: 1.5rem;
 		}
-		.brand-wrapper {
+		.logo-container {
 			margin-left: auto;
 			margin-right: auto;
 		}
