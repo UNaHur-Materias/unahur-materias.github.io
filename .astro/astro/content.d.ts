@@ -158,11 +158,13 @@ declare module 'astro:content' {
   collection: "asignaciones";
   data: any
 } & { render(): Render[".md"] };
+};
+"historial": {
 "template.md": {
 	id: "template.md";
   slug: "template";
   body: string;
-  collection: "asignaciones";
+  collection: "historial";
   data: any
 } & { render(): Render[".md"] };
 };
@@ -170,12 +172,7 @@ declare module 'astro:content' {
 	};
 
 	type DataEntryMap = {
-		"historial": Record<string, {
-  id: string;
-  collection: "historial";
-  data: any;
-}>;
-
+		
 	};
 
 	type AnyEntryMap = ContentEntryMap & DataEntryMap;
