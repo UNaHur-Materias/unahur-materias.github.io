@@ -4,7 +4,7 @@ description: Parcial grupal asincrónico
 fechaPublicacion: 2026-06-25
 active: true
 
-ejercicios: Comisión 1
+ejercicios:
   - name: "🚚 Hermes: Logística Global 📦"
     urlTemplate: https://github.com/unahur-obj2/envios-inteligentes
     destOrg: unahur-obj2-2026c1
@@ -15,7 +15,6 @@ ejercicios: Comisión 1
     comentarios:
       - name: 2do parcial para la comisión 1.
 
-ejercicios: Comisión 2
   - name: "🚚 Hermes: Logística Global 📦"
     urlTemplate: https://github.com/unahur-obj2/envios-inteligentes
     destOrg: unahur-obj2-2026c1
