@@ -4,18 +4,29 @@ description: Parcial grupal asincrónico
 fechaPublicacion: 2026-06-25
 active: true
 
-ejercicios:
-  - name: 🚚 Hermes: Logística Global 📦
+ejercicios: Comisión 1
+  - name: "🚚 Hermes: Logística Global 📦"
     urlTemplate: https://github.com/unahur-obj2/envios-inteligentes
     destOrg: unahur-obj2-2026c1
     type: group #group
     obligatorio: true
-    fechaDeEntrega: Se puede entregar hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs.
-
+    prefix: parcial2Com1_2026C1
+    fechaDeEntrega: Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs.
     comentarios:
-      - name: Ejercicio integrador tipo 2do parcial para practicar Command.
+      - name: 2do parcial para la comisión 1.
 
-  # - name: 🧾 Subastas online
+ejercicios: Comisión 2
+  - name: "🚚 Hermes: Logística Global 📦"
+    urlTemplate: https://github.com/unahur-obj2/envios-inteligentes
+    destOrg: unahur-obj2-2026c1
+    type: group #group
+    obligatorio: true
+    prefix: parcial2Com2_2026C1
+    fechaDeEntrega: Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs.
+    comentarios:
+      - name: 2do parcial para la comisión 2.
+
+# - name: 🧾 Subastas online
   #   urlTemplate: https://github.com/unahur-obj2-2026c1/subastas
   #   destOrg: unahur-obj2-2026c1
   #   type: individual
