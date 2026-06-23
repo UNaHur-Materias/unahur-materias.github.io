@@ -11,7 +11,7 @@ ejercicios:
     type: group #group
     obligatorio: true
     prefix: parcial2Com1_2026C1
-    fechaDeEntrega: Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs.
+    fechaDeEntrega: "Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs."
     comentarios:
       - name: 2do parcial para la comisión 1.
 
@@ -21,7 +21,7 @@ ejercicios:
     type: group #group
     obligatorio: true
     prefix: parcial2Com2_2026C1
-    fechaDeEntrega: Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs.
+    fechaDeEntrega: "Límite de entrega hasta el 01/07 a las 20.00 | Defensa oral 08/07 a las 18.00 hs."
     comentarios:
       - name: 2do parcial para la comisión 2.
 
