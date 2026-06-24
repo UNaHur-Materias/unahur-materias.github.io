@@ -268,7 +268,7 @@ const { title, ejercicios } = asig.data;
 			<main class="exercises-stack">
 				{
 					ejercicios &&
-						ejercicios.map((ej) => {
+						ejercicios.map((ej: any) => {
 							const partes = ej.urlTemplate
 								? ej.urlTemplate
 										.replace("https://github.com/", "")
@@ -309,7 +309,7 @@ const { title, ejercicios } = asig.data;
 									<h3>{ej.name}</h3>
 
 									{ej.comentarios &&
-										ej.comentarios.map((c) => (
+										ej.comentarios.map((c: any) => (
 											<div class="comment-box">
 												<p>{c.name}</p>
 											</div>

@@ -427,6 +427,21 @@ const formatearFecha = (fecha: string | Date) => {
 						if (loginStateCode)
 							loginStateCode.style.display = "block";
 
+						// CÓDIGO ACTUAL A MODIFICAR
+						// btnCopyAndGo?.addEventListener("click", () => {
+						// 	navigator.clipboard
+						// 		.writeText(user_code)
+						// 		.then(() => {
+						// 			btnCopyAndGo.textContent =
+						// 				"¡Copiado! Abriendo GitHub...";
+						// 			btnCopyAndGo.style.background = "#009bc3";
+						// 			setTimeout(() => {
+						// 				window.open(verification_uri, "_blank"); // <-- ESTA LÍNEA
+						// 			}, 400);
+						// 		});
+						// });
+
+						// REEMPLAZO SEGURO (Mantiene toda tu lógica intacta)
 						btnCopyAndGo?.addEventListener("click", () => {
 							navigator.clipboard
 								.writeText(user_code)
@@ -435,7 +450,21 @@ const formatearFecha = (fecha: string | Date) => {
 										"¡Copiado! Abriendo GitHub...";
 									btnCopyAndGo.style.background = "#009bc3";
 									setTimeout(() => {
-										window.open(verification_uri, "_blank");
+										// Configuramos el tamaño de la ventana flotante
+										const width = 600;
+										const height = 650;
+										// Calculamos la posición centrada relativa a la pantalla actual del usuario
+										const left =
+											window.screen.width / 2 - width / 2;
+										const top =
+											window.screen.height / 2 -
+											height / 2;
+
+										window.open(
+											verification_uri,
+											"GitHubDeviceAuth",
+											`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`,
+										);
 									}, 400);
 								});
 						});
