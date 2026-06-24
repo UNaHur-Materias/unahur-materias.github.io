@@ -95,3 +95,5 @@ ejercicios:
 ---
 
 Aquí puede ir el cuerpo del Markdown si se desea agregar texto o apuntes adicionales de soporte pedagógico para los alumnos. El layout lo renderizará automáticamente debajo de la sección de ejercicios.
+```
+
