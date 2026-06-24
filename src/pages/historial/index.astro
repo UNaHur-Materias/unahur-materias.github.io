@@ -3,6 +3,7 @@
 import { getCollection } from "astro:content";
 import HeaderUni from "../../components/HeaderUni.astro";
 import UserProfile from "@/components/UserProfile.astro";
+import Footer from "@/components/Footer.astro";
 
 const todasLasAsignacionesViejas = await getCollection("historial");
 
@@ -209,5 +210,6 @@ const formatearFecha = (fecha: string | Date) => {
                 }
             });
         </script>
+        <Footer />
     </body>
 </html>
