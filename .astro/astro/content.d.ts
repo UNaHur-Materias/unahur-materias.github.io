@@ -150,29 +150,73 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		"asignaciones": {
-"parcial2_2026C1.md": {
-	id: "parcial2_2026C1.md";
-  slug: "parcial2_2026c1";
+		"OLDERS": {
+"asignaciones/parcial2_2026C1.md": {
+	id: "asignaciones/parcial2_2026C1.md";
+  slug: "asignaciones/parcial2_2026c1";
   body: string;
-  collection: "asignaciones";
+  collection: "OLDERS";
+  data: any
+} & { render(): Render[".md"] };
+"historial/command.md": {
+	id: "historial/command.md";
+  slug: "historial/command";
+  body: string;
+  collection: "OLDERS";
+  data: any
+} & { render(): Render[".md"] };
+"historial/template.md": {
+	id: "historial/template.md";
+  slug: "historial/template";
+  body: string;
+  collection: "OLDERS";
   data: any
 } & { render(): Render[".md"] };
 };
-"historial": {
-"command.md": {
-	id: "command.md";
-  slug: "command";
+"asignaciones": Record<string, {
+  id: string;
+  slug: string;
+  body: string;
+  collection: "asignaciones";
+  data: InferEntrySchema<"asignaciones">;
+  render(): Render[".md"];
+}>;
+"historial": Record<string, {
+  id: string;
+  slug: string;
   body: string;
   collection: "historial";
-  data: any
+  data: InferEntrySchema<"historial">;
+  render(): Render[".md"];
+}>;
+"materias": {
+"materia-template/asignaciones/parcial2_2026C1.md": {
+	id: "materia-template/asignaciones/parcial2_2026C1.md";
+  slug: "materia-template/asignaciones/parcial2_2026c1";
+  body: string;
+  collection: "materias";
+  data: InferEntrySchema<"materias">
 } & { render(): Render[".md"] };
-"template.md": {
-	id: "template.md";
-  slug: "template";
+"materia-template/historial/command.md": {
+	id: "materia-template/historial/command.md";
+  slug: "materia-template/historial/command";
   body: string;
-  collection: "historial";
-  data: any
+  collection: "materias";
+  data: InferEntrySchema<"materias">
+} & { render(): Render[".md"] };
+"materia-template/historial/template.md": {
+	id: "materia-template/historial/template.md";
+  slug: "materia-template/historial/template";
+  body: string;
+  collection: "materias";
+  data: InferEntrySchema<"materias">
+} & { render(): Render[".md"] };
+"materia-template/obj1-2026c1.md": {
+	id: "materia-template/obj1-2026c1.md";
+  slug: "materia-template/obj1-2026c1";
+  body: string;
+  collection: "materias";
+  data: InferEntrySchema<"materias">
 } & { render(): Render[".md"] };
 };
 
@@ -184,5 +228,5 @@ declare module 'astro:content' {
 
 	type AnyEntryMap = ContentEntryMap & DataEntryMap;
 
-	export type ContentConfig = never;
+	export type ContentConfig = typeof import("./../../src/content/config.js");
 }
