@@ -1,0 +1,128 @@
+---
+// src/pages/materias/[...slug].astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	
+	// Filtramos las materias raíz (las que no son asignaciones ni historial)
+	const raicesMaterias = todoElContenido.filter(
+		(item) => !item.slug.includes("/asignaciones/") && !item.slug.includes("/historial/")
+	);
+
+	return raicesMaterias.map((mat) => ({
+		params: { slug: mat.slug }, // -> "materia-template/obj1-2026c1"
+		props: { mat },
+	}));
+}
+
+const { slug } = Astro.params; 
+const { mat } = Astro.props;
+
+// "materia-template/obj1-2026c1" -> ["materia-template", "obj1-2026c1"]
+const partesSlug = slug.split("/");
+const carpetaMateria = partesSlug[0]; // -> "materia-template"
+
+const todoElContenido = await getCollection("materias");
+
+// Filtramos asignaciones que pertenezcan a la carpeta de esta materia
+const asignacionesFiltradas = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === carpetaMateria && partes[1] === "asignaciones" && item.data.active !== false;
+});
+
+// Filtramos historial que pertenezca a la carpeta de esta materia
+const historialFiltrado = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === carpetaMateria && partes[1] === "historial" && item.data.active !== false;
+});
+
+const formatearFecha = (fecha: string | Date) => {
+	if (!fecha) return null;
+	return new Date(fecha).toLocaleDateString("es-AR", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+};
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{mat.data.title || "Materia"} - UNAHUR</title>
+		<style>
+			body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.back-link { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-block; }
+			.back-link:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; }
+			.section-title { font-size: 1.25rem; color: #ff9e1b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+			.asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+			.asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.2s; }
+			.asig-card:hover { border-color: #70b043; transform: translateY(-2px); }
+			.asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+			.asig-date { font-size: 0.75rem; color: #64748b; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{mat.data.title}</h1></HeaderUni>
+			<UserProfile />
+			<div class="nav-box"><a href="/" class="back-link">← Volver al inicio</a></div>
+
+			<main>
+				<h2 class="section-title">Asignaciones Activas</h2>
+				<div class="asig-grid">
+					{asignacionesFiltradas.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay asignaciones publicadas para esta cursada todavía.</p>
+					) : (
+						asignacionesFiltradas.map((asig) => {
+							const fechaPub = formatearFecha(asig.data.fechaPublicacion);
+							const archivoSlug = asig.slug.split("/").pop();
+							
+							// CORRECCIÓN DE LA URL:
+							// Usamos 'carpetaMateria' para que la URL sea /materias/materia-template/asignaciones/tp-nombre
+							// Esto engancha perfecto con tu archivo [materia]/[coleccion]/[slug].astro
+							return (
+								<a href={`/materias/${carpetaMateria}/asignaciones/${archivoSlug}`} class="asig-card">
+									<div class="asig-title-row">
+										<span>{asig.data.title}</span>
+										<span style="color: #70b043;">→</span>
+									</div>
+									{fechaPub && <span class="asig-date">Publicado: {fechaPub}</span>}
+								</a>
+							);
+						})
+					)}
+				</div>
+
+				<h2 class="section-title" style="color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 3rem; padding-top: 2rem;">Historial de Entregas</h2>
+				<div class="asig-grid">
+					{historialFiltrado.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay registros históricos guardados.</p>
+					) : (
+						historialFiltrado.map((h) => {
+							const archivoSlug = h.slug.split("/").pop();
+							return (
+								<a href={`/materias/${carpetaMateria}/historial/${archivoSlug}`} class="asig-card" style="opacity: 0.6;">
+									<div class="asig-title-row">
+										<span>{h.data.title}</span>
+										<span style="color: #009bc3;">→</span>
+									</div>
+								</a>
+							);
+						})
+					)}
+				</div>
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>

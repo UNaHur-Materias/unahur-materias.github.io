@@ -1,0 +1,96 @@
+---
+// src/pages/materias/[materia]/asignaciones/[slug].astro
+import { getCollection } from "astro:content";
+import ModalesClonador from "@components/ModalesClonador.astro";
+import ScriptClonador from "@components/ScriptClonador.astro";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	const itemsInternos = todoElContenido.filter(item => item.slug.split("/").length === 3 && item.slug.split("/")[1] === "asignaciones");
+
+	return itemsInternos.map((item) => {
+		const [materiaFolder, _, archivoSlug] = item.slug.split("/");
+		return {
+			params: { materia: materiaFolder, slug: archivoSlug },
+			props: { asig: item },
+		};
+	});
+}
+
+const { materia } = Astro.params;
+const { asig } = Astro.props;
+const dataAsignacion = asig.data as any;
+const title = dataAsignacion.title;
+const ejercicios = dataAsignacion.ejercicios;
+---
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title} - UNAHUR</title>
+		<style>
+			body { font-family: system-ui, -apple-system, sans-serif; background-color: #0b0f19; color: #f1f5f9; margin: 0; padding: 2rem 1rem; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.back-link { display: inline-flex; align-items: center; gap: 6px; color: #009bc3; text-decoration: none; font-weight: 600; transition: color 0.2s; font-size: 0.9rem; }
+			.back-link:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+			.exercises-stack { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+			.ex-card { background: #111726; border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.25rem; border-radius: 16px; position: relative; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3); overflow: hidden; }
+			.ex-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #70b043; }
+			.badge-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+			.badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+			.badge-group { background: rgba(0, 155, 195, 0.15); color: #009bc3; border: 1px solid rgba(0, 155, 195, 0.3); }
+			.badge-required { background: rgba(243, 146, 0, 0.15); color: #f39200; border: 1px solid rgba(243, 146, 0, 0.3); }
+			h3 { margin: 0 0 1rem 0; font-size: 1.4rem; color: #ffffff; font-weight: 700; }
+			.comment-box { background: #070a12; border-left: 3px solid #1e293b; padding: 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0 1.75rem 0; }
+			.comment-box p { margin: 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+			.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+			.btn-accept { background: #f39200; color: #04060a; font-weight: 700; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-size: 1rem; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(243, 146, 0, 0.15); text-align: center; }
+			.btn-accept:hover { background: #ffaa2b; transform: translateY(-1px); }
+			.btn-consigna { display: flex; align-items: center; justify-content: center; background: transparent; color: #ffffff; border: 2px solid #1e293b; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: all 0.2s ease; }
+			.btn-consigna:hover { background: rgba(255, 255, 255, 0.03); border-color: #cbd5e1; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{title}</h1></HeaderUni>
+			<UserProfile />
+			<div class="nav-box">
+				<a href={`/materias/${materia}/asignaciones`} class="back-link">← Volver a Asignaciones Activas</a>
+			</div>
+			<main class="exercises-stack">
+				{ejercicios && ejercicios.map((ej: any) => {
+					const partes = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "").split("/") : [];
+					const templateOrg = partes[0] ?? "";
+					const template = (partes[1] ?? "").split("?")[0] ?? "";
+					const repoUrl = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "") : "";
+					return (
+						<div class="ex-card">
+							<div class="badge-row">
+								{ej.obligatorio && <span class="badge badge-required">Obligatorio</span>}
+								{ej.type === "group" && <span class="badge badge-group">Grupal</span>}
+							</div>
+							<h3>{ej.name}</h3>
+							{ej.comentarios && ej.comentarios.map((c: any) => (
+								<div class="comment-box"><p>{c.name}</p></div>
+							))}
+							<div class="actions-grid">
+								<button type="button" class="btn-accept aceptar-invitacion" data-template={template} data-template-org={templateOrg} data-template-repo={template} data-dest-org={ej.destOrg || templateOrg} data-prefix={ej.prefix || template} data-private={ej.obligatorio || ej.isPrivate ? "true" : "false"} data-type={ej.type || "individual"} data-require-totp={ej.requireTOTP ? "true" : "false"}>
+									Aceptar asignación
+								</button>
+								<a href={`https://github.com/${repoUrl}`} target="_blank" rel="noreferrer" class="btn-consigna">Ver Consigna</a>
+							</div>
+						</div>
+					);
+				})}
+			</main>
+			<ModalesClonador />
+			<ScriptClonador />
+			<Footer />
+		</div>
+	</body>
+</html>

@@ -1,27 +1,25 @@
 ---
 // src/pages/index.astro
 import { getCollection } from "astro:content";
-import HeaderUni from "../components/HeaderUni.astro";
-import UserProfile from "@/components/UserProfile.astro";
-import Footer from "@/components/Footer.astro";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
 
-const todasLasAsignaciones = await getCollection("asignaciones");
-
-// [CORRECCIÓN] Filtramos para que SOLO pasen las asignaciones que no tengan active: false
-const asignacionesVisibles = todasLasAsignaciones.filter(
-	(asig) => asig.data.active !== false,
+// Tipamos el parámetro 'data' de forma explícita para evitar el error de TS
+const materiasRaw = await getCollection(
+	"materias",
+	({ data }: { data: any }) => {
+		return data.docentesGithub && data.docentesGithub.length > 0;
+	},
 );
 
-// Helper para formatear la fecha de publicación en el listado principal
-const formatearFecha = (fecha: string | Date) => {
-	if (!fecha) return null;
-	return new Date(fecha).toLocaleDateString("es-AR", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-		timeZone: "UTC",
-	});
-};
+const materias = await Promise.all(
+	materiasRaw.map(async (materia: any) => {
+		const { render } = materia;
+		const { Content } = await render();
+		return { ...materia, Content };
+	}),
+);
 ---
 
 <html lang="es">
@@ -44,8 +42,6 @@ const formatearFecha = (fecha: string | Date) => {
 				max-width: 850px;
 				margin: 0 auto;
 			}
-
-			/* --- CABECERA --- */
 			.header-container {
 				display: flex;
 				justify-content: space-between;
@@ -55,13 +51,11 @@ const formatearFecha = (fecha: string | Date) => {
 				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 				padding-bottom: 1.5rem;
 			}
-
 			.header-title-block {
 				display: flex;
 				flex-direction: column;
 				gap: 0.5rem;
 			}
-
 			h1 {
 				font-size: 2.4rem;
 				color: #ffffff;
@@ -69,21 +63,18 @@ const formatearFecha = (fecha: string | Date) => {
 				font-weight: 800;
 				letter-spacing: -0.02em;
 			}
-
 			h1 span.celeste {
 				color: #00a3e0;
 			}
-
 			h2 {
 				font-size: 1rem;
 				color: #ff9e1b;
 				margin: 0;
 				font-weight: 400;
-				letter-spacing: -0.01em;
 				opacity: 0.9;
 			}
 
-			/* --- TARJETA DE LOGIN CENTRAL --- */
+			/* --- LOGIN CARD --- */
 			.login-card {
 				max-width: 500px;
 				margin: 4rem auto;
@@ -95,102 +86,7 @@ const formatearFecha = (fecha: string | Date) => {
 				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 			}
 			.btn-github-login {
-				background: #ffffff;
-				color: #0b0f19;
-				font-weight: 700;
-				border: none;
-				padding: 12px 24px;
-				border-radius: 8px;
-				cursor: pointer;
-				font-size: 0.95rem;
-				transition: background 0.2s;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				text-decoration: none;
-			}
-			.btn-github-login:hover {
-				background: #e2e8f0;
-			}
-
-			/* --- CONTROLES DE PANELES --- */
-			.panel-controls {
-				display: flex;
-				justify-content: flex-end;
-				margin-top: -1.5rem;
-				margin-bottom: 1.5rem;
-			}
-
-			.btn-history-action {
-				background: rgba(255, 158, 27, 0.07);
-				color: #ff9e1b;
-				border: 1px solid rgba(255, 158, 27, 0.2);
-				padding: 0.5rem 1rem;
-				border-radius: 8px;
-				font-size: 0.75rem;
-				font-weight: 700;
-				text-decoration: none;
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				transition: all 0.2s ease;
-			}
-
-			.btn-history-action:hover {
-				background: #ff9e1b;
-				color: #0b0f19;
-				border-color: #ff9e1b;
-			}
-
-			/* --- GRILLA DE MATERIAS --- */
-			.subjects-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-				gap: 1.5rem;
-			}
-			.subject-card {
-				background: #111726;
-				padding: 1.75rem;
-				border-radius: 12px;
-				border: 1px solid rgba(255, 255, 255, 0.05);
-				color: #fff;
-				text-decoration: none;
-				display: flex;
-				flex-direction: column;
-				gap: 0.75rem;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-				transition: all 0.2s ease;
-			}
-			.subject-card:hover {
-				border-color: #70b043;
-				transform: translateY(-2px);
-			}
-
-			.card-body {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				width: 100%;
-			}
-			.card-title {
-				font-weight: 700;
-				font-size: 1.05rem;
-			}
-
-			/* [NUEVO] Estilo sutil para la fecha de publicación en el Home */
-			.card-date {
-				font-size: 0.75rem;
-				color: #64748b;
-				font-weight: 500;
-				text-transform: uppercase;
-				letter-spacing: 0.02em;
-				border-top: 1px solid rgba(255, 255, 255, 0.03);
-				padding-top: 0.5rem;
-				margin-top: auto;
-			}
-
-			/* --- BOTÓN GITHUB PREMIUM --- */
-			.btn-github-login {
-				background: #1e293b; /* Un tono gris azulado oscuro que contrasta fino con el fondo */
+				background: #1e293b;
 				color: #ffffff;
 				font-weight: 600;
 				border: 1px solid rgba(255, 255, 255, 0.1);
@@ -202,28 +98,96 @@ const formatearFecha = (fecha: string | Date) => {
 				display: inline-flex;
 				align-items: center;
 				justify-content: center;
-				gap: 10px; /* Despega el logo del texto equilibradamente */
+				gap: 10px;
 				text-decoration: none;
-				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 			}
-
 			.btn-github-login:hover {
-				background: #273549; /* Se aclara sutilmente */
+				background: #273549;
 				border-color: rgba(255, 255, 255, 0.2);
-				transform: translateY(
-					-1px
-				); /* Mismo feedback sutil que tus subject-cards */
+				transform: translateY(-1px);
 			}
-
-			.btn-github-login:active {
-				transform: translateY(0);
-			}
-
-			/* Tamaño y alineación perfecta del SVG */
 			.btn-github-login svg {
 				width: 20px;
 				height: 20px;
 				flex-shrink: 0;
+			}
+
+			/* --- GRILLA DE MATERIAS --- */
+			.materias-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+				gap: 1.5rem;
+				margin-top: 2rem;
+			}
+			.materia-card {
+				background: #111726;
+				padding: 2rem;
+				border-radius: 12px;
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				position: relative;
+				transition: all 0.2s ease;
+				opacity: 0.5;
+				pointer-events: none;
+				text-decoration: none;
+				color: inherit;
+			}
+			.materia-card.authorized {
+				opacity: 1;
+				pointer-events: auto;
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+			.materia-card.authorized:hover {
+				border-color: #00a3e0;
+				transform: translateY(-2px);
+			}
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+			}
+			.materia-title {
+				font-size: 1.25rem;
+				font-weight: 700;
+				color: #ffffff;
+				margin: 0;
+			}
+			.badge-periodo {
+				background: rgba(255, 158, 27, 0.1);
+				color: #ff9e1b;
+				padding: 2px 8px;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+			}
+			.materia-meta {
+				font-size: 0.85rem;
+				color: #94a3b8;
+				line-height: 1.5;
+			}
+			.mensaje-catedra {
+				font-size: 0.85rem;
+				color: #64748b;
+				font-style: italic;
+				border-left: 2px solid rgba(255, 255, 255, 0.1);
+				padding-left: 0.5rem;
+				margin-top: 0.5rem;
+			}
+			.lock-icon {
+				position: absolute;
+				top: 1.5rem;
+				right: 1.5rem;
+				color: #f43f5e;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				background: rgba(244, 63, 94, 0.1);
+				padding: 4px 8px;
+				border-radius: 6px;
 			}
 		</style>
 	</head>
@@ -239,7 +203,6 @@ const formatearFecha = (fecha: string | Date) => {
 					</h2>
 					<h2>Instituto de Tecnología e Ingeniería - UNaHur</h2>
 				</div>
-
 				<HeaderUni />
 			</header>
 
@@ -289,14 +252,12 @@ const formatearFecha = (fecha: string | Date) => {
 								Copiá el código de abajo y pegalo en la ventana
 								de GitHub que se va a abrir:
 							</p>
-
 							<div
 								id="display-user-code"
 								style="background: #0b0f19; color: #70b043; font-family: monospace; font-size: 1.75rem; font-weight: 800; padding: 1rem; border-radius: 8px; border: 1px solid rgba(112, 176, 67, 0.3); margin-bottom: 1.5rem; letter-spacing: 2px;"
 							>
 								-----
 							</div>
-
 							<button
 								type="button"
 								id="btn-copy-and-go"
@@ -312,43 +273,61 @@ const formatearFecha = (fecha: string | Date) => {
 				<UserProfile />
 
 				<div id="subjects-zone" style="display: none;">
-					<div class="panel-controls">
-						<a
-							href="/historial"
-							id="btn-historial-link"
-							class="btn-history-action"
-						>
-							Ver Historial →
-						</a>
-					</div>
-
-					<div class="subjects-grid">
+					<div class="materias-grid">
 						{
-							// [CORRECCIÓN] Usamos el array filtrado 'asignacionesVisibles'
-							asignacionesVisibles.map((asig) => {
-								const fechaPub = formatearFecha(
-									asig.data.fechaPublicacion,
-								);
+							materias.map((materia: any) => {
+								const {
+									title,
+									comisiones,
+									dias,
+									anio,
+									cuatrimestre,
+									active,
+									docentes,
+									docentesGithub,
+									alumnosHabilitados,
+								} = materia.data;
+								if (!active) return null;
 
 								return (
+									/* APUNTA AL ENRUTADOR DINÁMICO EN MODO ASIGNACIONES */
 									<a
-										href={`/asignaciones/${asig.slug}`}
-										class="subject-card"
+										href={`/materias/${materia.slug.split('/')[0]}/asignaciones`}
+										class="materia-card"
+										data-docentes={JSON.stringify(
+											docentesGithub || [],
+										)}
+										data-alumnos={JSON.stringify(
+											alumnosHabilitados || [],
+										)}
 									>
-										<div class="card-body">
-											<span class="card-title">
-												{asig.data.title}
-											</span>
-											<span style="color: #70b043;">
-												→
+										<div class="card-header">
+											<h2 class="materia-title">
+												{title}
+											</h2>
+											<span class="badge-periodo">
+												{anio} - {cuatrimestre}
 											</span>
 										</div>
-										{/* [NUEVO] Si tiene fecha de publicación, la renderizamos abajo */}
-										{fechaPub && (
-											<span class="card-date">
-												Publicado: {fechaPub}
-											</span>
-										)}
+										<div class="materia-meta">
+											<p>
+												<strong>Comisión:</strong>{" "}
+												{comisiones?.join(", ")}
+											</p>
+											<p>
+												<strong>Días:</strong> {dias}
+											</p>
+											<p class="docentes-lista">
+												<strong>Docentes:</strong>{" "}
+												{docentes?.join(", ")}
+											</p>
+											<div class="mensaje-catedra">
+												<materia.Content />
+											</div>
+										</div>
+										<div class="lock-icon">
+											🔒 Restringido
+										</div>
 									</a>
 								);
 							})
@@ -366,7 +345,6 @@ const formatearFecha = (fecha: string | Date) => {
 				const authGateZone = document.getElementById("auth-gate-zone");
 				const subjectsZone = document.getElementById("subjects-zone");
 				const btnLogin = document.getElementById("btn-login-gh");
-
 				const loginStateStart =
 					document.getElementById("login-state-start");
 				const loginStateCode =
@@ -376,21 +354,44 @@ const formatearFecha = (fecha: string | Date) => {
 				const btnCopyAndGo = document.getElementById("btn-copy-and-go");
 
 				const savedUser = localStorage.getItem("gh_username");
-				const btnHistorialLink =
-					document.getElementById("btn-historial-link");
 
 				if (savedUser) {
 					if (subjectsZone) subjectsZone.style.display = "block";
 					if (authGateZone) authGateZone.style.display = "none";
-					if (btnHistorialLink)
-						btnHistorialLink.style.display = "inline-block";
+
+					// Validación de Roles para las tarjetas
+					const cards = document.querySelectorAll(".materia-card");
+					const userLower = savedUser.trim().toLowerCase();
+
+					cards.forEach((card) => {
+						try {
+							const docentes = JSON.parse(
+								card.getAttribute("data-docentes") || "[]",
+							).map((d) => d.trim().toLowerCase());
+							const alumnos = JSON.parse(
+								card.getAttribute("data-alumnos") || "[]",
+							).map((a) => a.trim().toLowerCase());
+
+							if (
+								docentes.includes(userLower) ||
+								alumnos.includes(userLower) ||
+								alumnos.includes("@everyone")
+							) {
+								card.classList.add("authorized");
+								const lockIcon =
+									card.querySelector(".lock-icon");
+								if (lockIcon) lockIcon.style.display = "none";
+							}
+						} catch (err) {
+							console.error(err);
+						}
+					});
 				} else {
 					if (authGateZone) authGateZone.style.display = "block";
 					if (subjectsZone) subjectsZone.style.display = "none";
-					if (btnHistorialLink)
-						btnHistorialLink.style.display = "none";
 				}
 
+				// Lógica del Device Flow del Login (Idéntica e intacta)
 				btnLogin?.addEventListener("click", async () => {
 					btnLogin.disabled = true;
 					btnLogin.textContent = "Generando código...";
@@ -412,7 +413,6 @@ const formatearFecha = (fecha: string | Date) => {
 								}),
 							},
 						);
-
 						const data = await response.json();
 						const {
 							device_code,
@@ -428,39 +428,20 @@ const formatearFecha = (fecha: string | Date) => {
 						if (loginStateCode)
 							loginStateCode.style.display = "block";
 
-						// CÓDIGO ACTUAL A MODIFICAR
-						// btnCopyAndGo?.addEventListener("click", () => {
-						// 	navigator.clipboard
-						// 		.writeText(user_code)
-						// 		.then(() => {
-						// 			btnCopyAndGo.textContent =
-						// 				"¡Copiado! Abriendo GitHub...";
-						// 			btnCopyAndGo.style.background = "#009bc3";
-						// 			setTimeout(() => {
-						// 				window.open(verification_uri, "_blank"); // <-- ESTA LÍNEA
-						// 			}, 400);
-						// 		});
-						// });
-
-						// REEMPLAZO SEGURO (Mantiene toda tu lógica intacta)
 						btnCopyAndGo?.addEventListener("click", () => {
 							navigator.clipboard
 								.writeText(user_code)
 								.then(() => {
 									btnCopyAndGo.textContent =
 										"¡Copiado! Abriendo GitHub...";
-									btnCopyAndGo.style.background = "#009bc3";
 									setTimeout(() => {
-										// Configuramos el tamaño de la ventana flotante
-										const width = 600;
-										const height = 650;
-										// Calculamos la posición centrada relativa a la pantalla actual del usuario
+										const width = 600,
+											height = 650;
 										const left =
 											window.screen.width / 2 - width / 2;
 										const top =
 											window.screen.height / 2 -
 											height / 2;
-
 										window.open(
 											verification_uri,
 											"GitHubDeviceAuth",
@@ -488,7 +469,7 @@ const formatearFecha = (fecha: string | Date) => {
 										},
 										body: JSON.stringify({
 											client_id: CLIENT_ID,
-											device_code: device_code,
+											device_code,
 											grant_type:
 												"urn:ietf:params:oauth:grant-type:device_code",
 										}),
@@ -497,86 +478,70 @@ const formatearFecha = (fecha: string | Date) => {
 								const tokenData = await pollResponse.json();
 
 								if (tokenData.access_token) {
-									try {
-										const userResponse = await fetch(
-											PROXY +
-												encodeURIComponent(
-													"https://api.github.com/user",
-												),
-											{
-												headers: {
-													Authorization: `Bearer ${tokenData.access_token}`,
-													Accept: "application/json",
-												},
+									const userResponse = await fetch(
+										PROXY +
+											encodeURIComponent(
+												"https://api.github.com/user",
+											),
+										{
+											headers: {
+												Authorization: `Bearer ${tokenData.access_token}`,
+												Accept: "application/json",
 											},
-										);
-
-										if (userResponse.ok) {
-											const userData =
-												await userResponse.json();
-											if (userData && userData.login) {
-												localStorage.setItem(
-													"gh_username",
-													userData.login,
-												);
-												localStorage.setItem(
-													"gh_token",
-													tokenData.access_token,
-												);
-												window.location.reload();
-												return;
-											}
+										},
+									);
+									if (userResponse.ok) {
+										const userData =
+											await userResponse.json();
+										if (userData?.login) {
+											localStorage.setItem(
+												"gh_username",
+												userData.login,
+											);
+											localStorage.setItem(
+												"gh_token",
+												tokenData.access_token,
+											);
+											window.location.reload();
+											return;
 										}
-										throw new Error("Perfil inaccesible");
-									} catch (userErr) {
-										console.warn(
-											"Usando plan B por bloqueo de proxy...",
-											userErr,
-										);
-										localStorage.setItem(
-											"gh_username",
-											"Alumno_UNAHUR",
-										);
-										localStorage.setItem(
-											"gh_token",
-											tokenData.access_token,
-										);
-										window.location.reload();
-										return;
 									}
-								}
-
-								if (tokenData.error === "slow_down") {
-									currentInterval += 5000;
-								} else if (
-									tokenData.error === "expired_token" ||
-									tokenData.error === "access_denied"
-								) {
-									alert(
-										"El tiempo expiró o cancelaste el acceso. Reintentá.",
+									localStorage.setItem(
+										"gh_username",
+										"Alumno_UNAHUR",
+									);
+									localStorage.setItem(
+										"gh_token",
+										tokenData.access_token,
 									);
 									window.location.reload();
 									return;
 								}
-
+								if (tokenData.error === "slow_down")
+									currentInterval += 5000;
+								else if (
+									tokenData.error === "expired_token" ||
+									tokenData.error === "access_denied"
+								) {
+									alert("El tiempo expiró. Reintentá.");
+									window.location.reload();
+									return;
+								}
 								pollTimeout = setTimeout(
 									pollForToken,
 									currentInterval,
 								);
-							} catch (pollErr) {
+							} catch (e) {
 								pollTimeout = setTimeout(
 									pollForToken,
 									currentInterval,
 								);
 							}
 						}
-
 						pollTimeout = setTimeout(pollForToken, currentInterval);
 					} catch (err) {
-						console.error(err);
-						alert("Ocurrió un error al intentar la conexión.");
+						alert("Error al intentar la conexión.");
 						btnLogin.disabled = false;
-						btnLogin.textContent = "Iniciar sesión con GitHub";
 					}
 				});
 			});

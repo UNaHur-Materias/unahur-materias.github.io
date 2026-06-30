@@ -1,0 +1,79 @@
+---
+// src/pages/materias/[materia]/historial/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	const carpetasUnicas = [...new Set(todoElContenido.map(item => item.slug.split("/")[0]))];
+	return carpetasUnicas.map(materia => ({ params: { materia } }));
+}
+
+const { materia } = Astro.params;
+const todoElContenido = await getCollection("materias");
+
+const infoMateria = todoElContenido.find(item => item.slug.startsWith(materia + "/") && item.slug.split("/").length === 2);
+const nombreMateria = infoMateria ? infoMateria.data.title : materia;
+
+// Filtrar historial de esta materia
+const historialFiltrado = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === materia && partes[1] === "historial" && (item.data as any).active !== false;
+});
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Historial - {nombreMateria}</title>
+		<style>
+			body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.link-azul { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+			.link-azul:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; }
+			.section-title { font-size: 1.25rem; color: #64748b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+			.asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+			.asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; opacity: 0.75; transition: all 0.2s; }
+			.asig-card:hover { border-color: #f39200; opacity: 1; transform: translateY(-2px); }
+			.asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>Historial: {nombreMateria}</h1></HeaderUni>
+			<UserProfile />
+			
+			<div class="nav-box">
+				<a href={`/materias/${materia}/asignaciones`} class="link-azul">← Volver a Asignaciones Activas</a>
+			</div>
+
+			<main>
+				<h2 class="section-title">Asignaciones Pasadas</h2>
+				<div class="asig-grid">
+					{historialFiltrado.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay registros históricos en esta materia.</p>
+					) : (
+						historialFiltrado.map((item) => {
+							const dataHistorial = item.data as any;
+							const archivoSlug = item.slug.split("/").pop();
+							return (
+								<a href={`/materias/${materia}/historial/${archivoSlug}`} class="asig-card">
+									<div class="asig-title-row">
+										<span>{dataHistorial.title}</span>
+										<span style="color: #f39200;">→</span>
+									</div>
+								</a>
+							);
+						})
+					)}
+				</div>
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>

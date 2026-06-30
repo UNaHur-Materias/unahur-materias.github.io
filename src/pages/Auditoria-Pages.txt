@@ -1,0 +1,1635 @@
+AUDITORIA DE ENRUTAMIENTO Y LOGICA DE PAGES
+Generado el: 06/29/2026 12:44:13
+================================================================================
+
+[ESTRUCTURA DE ARCHIVOS EN PAGES]
+  asignaciones
+  historial
+  materias
+  [materia]
+  404.astro
+  Auditar-pages.ps1
+  index.astro
+  historial\index.astro
+  materias\[materia]
+  materias\[slug].astro
+  materias\[materia]\asignaciones
+  materias\[materia]\historial
+  materias\[materia]\[coleccion]
+  materias\[materia]\asignaciones\index.astro
+  materias\[materia]\historial\index.astro
+  materias\[materia]\[coleccion]\[slug].astro
+  [materia]\[coleccion]
+  [materia]\index.astro
+  [materia]\[coleccion]\[slug].astro
+
+================================================================================
+
+[CODIGO FUENTE DE LOS ARCHIVOS .ASTRO EN PAGES]
+
+--- ARCHIVO: 404.astro ---
+---
+// src/pages/404.astro
+import Footer from "@/components/Footer.astro";
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>404 - P�gina no encontrada</title>
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				background: #f4f6f9;
+				color: #1e293b;
+				margin: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				text-align: center;
+			}
+			.container {
+				max-width: 500px;
+				padding: 2rem;
+			}
+			h1 {
+				font-size: 5rem;
+				margin: 0;
+				color: #0f172a;
+			}
+			p {
+				color: #64748b;
+				font-size: 1.25rem;
+				margin: 1rem 0 2rem 0;
+			}
+			.btn {
+				display: inline-block;
+				background: #0f172a;
+				color: white;
+				padding: 0.75rem 1.5rem;
+				border-radius: 8px;
+				text-decoration: none;
+				font-weight: 600;
+			}
+			.btn:hover {
+				background: #1e293b;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>404</h1>
+			<p>Ups, la p�gina que est�s buscando no existe o fue movida.</p>
+			<a href="/" class="btn">Volver al inicio</a>
+		</div>
+		<Footer />
+	</body>
+</html>
+
+
+================================================================================
+
+--- ARCHIVO: index.astro ---
+---
+// src/pages/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+// Tipamos el par�metro 'data' de forma expl�cita para evitar el error de TS
+const materiasRaw = await getCollection(
+	"materias",
+	({ data }: { data: any }) => {
+		return data.docentesGithub && data.docentesGithub.length > 0;
+	},
+);
+
+const materias = await Promise.all(
+	materiasRaw.map(async (materia: any) => {
+		const { render } = materia;
+		const { Content } = await render();
+		return { ...materia, Content };
+	}),
+);
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Panel de Asignaciones - UNAHUR</title>
+		<style>
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+				background-color: #0b0f19;
+				color: #f1f5f9;
+				margin: 0;
+				padding: 2rem 1rem;
+			}
+			.container {
+				max-width: 850px;
+				margin: 0 auto;
+			}
+			.header-container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 3rem;
+				gap: 2rem;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				padding-bottom: 1.5rem;
+			}
+			.header-title-block {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+			h1 {
+				font-size: 2.4rem;
+				color: #ffffff;
+				margin: 0;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+			}
+			h1 span.celeste {
+				color: #00a3e0;
+			}
+			h2 {
+				font-size: 1rem;
+				color: #ff9e1b;
+				margin: 0;
+				font-weight: 400;
+				opacity: 0.9;
+			}
+
+			/* --- LOGIN CARD --- */
+			.login-card {
+				max-width: 500px;
+				margin: 4rem auto;
+				background: #111726;
+				border: 1px dashed rgba(255, 255, 255, 0.15);
+				padding: 2.5rem;
+				border-radius: 16px;
+				text-align: center;
+				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+			}
+			.btn-github-login {
+				background: #1e293b;
+				color: #ffffff;
+				font-weight: 600;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				padding: 12px 24px;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 0.95rem;
+				transition: all 0.2s ease;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+				text-decoration: none;
+			}
+			.btn-github-login:hover {
+				background: #273549;
+				border-color: rgba(255, 255, 255, 0.2);
+				transform: translateY(-1px);
+			}
+			.btn-github-login svg {
+				width: 20px;
+				height: 20px;
+				flex-shrink: 0;
+			}
+
+			/* --- GRILLA DE MATERIAS --- */
+			.materias-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+				gap: 1.5rem;
+				margin-top: 2rem;
+			}
+			.materia-card {
+				background: #111726;
+				padding: 2rem;
+				border-radius: 12px;
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				position: relative;
+				transition: all 0.2s ease;
+				opacity: 0.5;
+				pointer-events: none;
+				text-decoration: none;
+				color: inherit;
+			}
+			.materia-card.authorized {
+				opacity: 1;
+				pointer-events: auto;
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+			.materia-card.authorized:hover {
+				border-color: #00a3e0;
+				transform: translateY(-2px);
+			}
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+			}
+			.materia-title {
+				font-size: 1.25rem;
+				font-weight: 700;
+				color: #ffffff;
+				margin: 0;
+			}
+			.badge-periodo {
+				background: rgba(255, 158, 27, 0.1);
+				color: #ff9e1b;
+				padding: 2px 8px;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+			}
+			.materia-meta {
+				font-size: 0.85rem;
+				color: #94a3b8;
+				line-height: 1.5;
+			}
+			.mensaje-catedra {
+				font-size: 0.85rem;
+				color: #64748b;
+				font-style: italic;
+				border-left: 2px solid rgba(255, 255, 255, 0.1);
+				padding-left: 0.5rem;
+				margin-top: 0.5rem;
+			}
+			.lock-icon {
+				position: absolute;
+				top: 1.5rem;
+				right: 1.5rem;
+				color: #f43f5e;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				background: rgba(244, 63, 94, 0.1);
+				padding: 4px 8px;
+				border-radius: 6px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header class="header-container">
+				<div class="header-title-block">
+					<h1>
+						Asignaciones <span class="celeste">Disponibles</span>
+					</h1>
+					<h2>
+						Entorno de gesti�n de repositorios y entregas de c�digo.
+					</h2>
+					<h2>Instituto de Tecnolog�a e Ingenier�a - UNaHur</h2>
+				</div>
+				<HeaderUni />
+			</header>
+
+			<main id="main-content">
+				<div id="auth-gate-zone" style="display: none;">
+					<div class="login-card">
+						<div id="login-state-start">
+							<h3
+								style="margin: 0 0 0.5rem 0; color: #f43f5e; font-size: 1.4rem;"
+							>
+								Acceso Restringido
+							</h3>
+							<p
+								style="color: #94a3b8; font-size: 0.9rem; margin: 0 0 1.5rem 0; line-height: 1.5;"
+							>
+								Para visualizar las materias asignadas y
+								descargar tus ejercicios, por favor vincul� tu
+								cuenta.
+							</p>
+							<button
+								type="button"
+								id="btn-login-gh"
+								class="btn-github-login"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+									></path>
+								</svg>
+								<span>Iniciar sesi�n con GitHub</span>
+							</button>
+						</div>
+
+						<div id="login-state-code" style="display: none;">
+							<h3
+								style="margin: 0 0 0.5rem 0; color: #fff; font-size: 1.4rem;"
+							>
+								�C�digo Generado!
+							</h3>
+							<p
+								style="color: #94a3b8; font-size: 0.9rem; margin: 0 0 1.5rem 0;"
+							>
+								Copi� el c�digo de abajo y pegalo en la ventana
+								de GitHub que se va a abrir:
+							</p>
+							<div
+								id="display-user-code"
+								style="background: #0b0f19; color: #70b043; font-family: monospace; font-size: 1.75rem; font-weight: 800; padding: 1rem; border-radius: 8px; border: 1px solid rgba(112, 176, 67, 0.3); margin-bottom: 1.5rem; letter-spacing: 2px;"
+							>
+								-----
+							</div>
+							<button
+								type="button"
+								id="btn-copy-and-go"
+								class="btn-github-login"
+								style="background: #70b043; color: #fff; width: 100%;"
+							>
+								Copiar c�digo e ir a GitHub ??
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<UserProfile />
+
+				<div id="subjects-zone" style="display: none;">
+					<div class="materias-grid">
+						{
+							materias.map((materia: any) => {
+								const {
+									title,
+									comisiones,
+									dias,
+									anio,
+									cuatrimestre,
+									active,
+									docentes,
+									docentesGithub,
+									alumnosHabilitados,
+								} = materia.data;
+								if (!active) return null;
+
+								return (
+									/* APUNTA AL ENRUTADOR DIN�MICO EN MODO ASIGNACIONES */
+									<a
+										href={`/materias/${materia.slug.split('/')[0]}/asignaciones`}
+										class="materia-card"
+										data-docentes={JSON.stringify(
+											docentesGithub || [],
+										)}
+										data-alumnos={JSON.stringify(
+											alumnosHabilitados || [],
+										)}
+									>
+										<div class="card-header">
+											<h2 class="materia-title">
+												{title}
+											</h2>
+											<span class="badge-periodo">
+												{anio} - {cuatrimestre}
+											</span>
+										</div>
+										<div class="materia-meta">
+											<p>
+												<strong>Comisi�n:</strong>{" "}
+												{comisiones?.join(", ")}
+											</p>
+											<p>
+												<strong>D�as:</strong> {dias}
+											</p>
+											<p class="docentes-lista">
+												<strong>Docentes:</strong>{" "}
+												{docentes?.join(", ")}
+											</p>
+											<div class="mensaje-catedra">
+												<materia.Content />
+											</div>
+										</div>
+										<div class="lock-icon">
+											?? Restringido
+										</div>
+									</a>
+								);
+							})
+						}
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script is:inline>
+			document.addEventListener("DOMContentLoaded", () => {
+				const CLIENT_ID = "Ov23liWzS33fUAJ8vbi6";
+				const PROXY = "https://corsproxy.io/?";
+
+				const authGateZone = document.getElementById("auth-gate-zone");
+				const subjectsZone = document.getElementById("subjects-zone");
+				const btnLogin = document.getElementById("btn-login-gh");
+				const loginStateStart =
+					document.getElementById("login-state-start");
+				const loginStateCode =
+					document.getElementById("login-state-code");
+				const displayUserCode =
+					document.getElementById("display-user-code");
+				const btnCopyAndGo = document.getElementById("btn-copy-and-go");
+
+				const savedUser = localStorage.getItem("gh_username");
+
+				if (savedUser) {
+					if (subjectsZone) subjectsZone.style.display = "block";
+					if (authGateZone) authGateZone.style.display = "none";
+
+					// Validaci�n de Roles para las tarjetas
+					const cards = document.querySelectorAll(".materia-card");
+					const userLower = savedUser.trim().toLowerCase();
+
+					cards.forEach((card) => {
+						try {
+							const docentes = JSON.parse(
+								card.getAttribute("data-docentes") || "[]",
+							).map((d) => d.trim().toLowerCase());
+							const alumnos = JSON.parse(
+								card.getAttribute("data-alumnos") || "[]",
+							).map((a) => a.trim().toLowerCase());
+
+							if (
+								docentes.includes(userLower) ||
+								alumnos.includes(userLower) ||
+								alumnos.includes("@everyone")
+							) {
+								card.classList.add("authorized");
+								const lockIcon =
+									card.querySelector(".lock-icon");
+								if (lockIcon) lockIcon.style.display = "none";
+							}
+						} catch (err) {
+							console.error(err);
+						}
+					});
+				} else {
+					if (authGateZone) authGateZone.style.display = "block";
+					if (subjectsZone) subjectsZone.style.display = "none";
+				}
+
+				// L�gica del Device Flow del Login (Id�ntica e intacta)
+				btnLogin?.addEventListener("click", async () => {
+					btnLogin.disabled = true;
+					btnLogin.textContent = "Generando c�digo...";
+					try {
+						const response = await fetch(
+							PROXY +
+								encodeURIComponent(
+									"https://github.com/login/device/code",
+								),
+							{
+								method: "POST",
+								headers: {
+									Accept: "application/json",
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify({
+									client_id: CLIENT_ID,
+									scope: "read:user",
+								}),
+							},
+						);
+						const data = await response.json();
+						const {
+							device_code,
+							user_code,
+							verification_uri,
+							interval,
+						} = data;
+
+						if (displayUserCode)
+							displayUserCode.textContent = user_code;
+						if (loginStateStart)
+							loginStateStart.style.display = "none";
+						if (loginStateCode)
+							loginStateCode.style.display = "block";
+
+						btnCopyAndGo?.addEventListener("click", () => {
+							navigator.clipboard
+								.writeText(user_code)
+								.then(() => {
+									btnCopyAndGo.textContent =
+										"�Copiado! Abriendo GitHub...";
+									setTimeout(() => {
+										const width = 600,
+											height = 650;
+										const left =
+											window.screen.width / 2 - width / 2;
+										const top =
+											window.screen.height / 2 -
+											height / 2;
+										window.open(
+											verification_uri,
+											"GitHubDeviceAuth",
+											`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`,
+										);
+									}, 400);
+								});
+						});
+
+						let currentInterval = (interval || 5) * 1000;
+						let pollTimeout;
+
+						async function pollForToken() {
+							try {
+								const pollResponse = await fetch(
+									PROXY +
+										encodeURIComponent(
+											"https://github.com/login/oauth/access_token",
+										),
+									{
+										method: "POST",
+										headers: {
+											Accept: "application/json",
+											"Content-Type": "application/json",
+										},
+										body: JSON.stringify({
+											client_id: CLIENT_ID,
+											device_code,
+											grant_type:
+												"urn:ietf:params:oauth:grant-type:device_code",
+										}),
+									},
+								);
+								const tokenData = await pollResponse.json();
+
+								if (tokenData.access_token) {
+									const userResponse = await fetch(
+										PROXY +
+											encodeURIComponent(
+												"https://api.github.com/user",
+											),
+										{
+											headers: {
+												Authorization: `Bearer ${tokenData.access_token}`,
+												Accept: "application/json",
+											},
+										},
+									);
+									if (userResponse.ok) {
+										const userData =
+											await userResponse.json();
+										if (userData?.login) {
+											localStorage.setItem(
+												"gh_username",
+												userData.login,
+											);
+											localStorage.setItem(
+												"gh_token",
+												tokenData.access_token,
+											);
+											window.location.reload();
+											return;
+										}
+									}
+									localStorage.setItem(
+										"gh_username",
+										"Alumno_UNAHUR",
+									);
+									localStorage.setItem(
+										"gh_token",
+										tokenData.access_token,
+									);
+									window.location.reload();
+									return;
+								}
+								if (tokenData.error === "slow_down")
+									currentInterval += 5000;
+								else if (
+									tokenData.error === "expired_token" ||
+									tokenData.error === "access_denied"
+								) {
+									alert("El tiempo expir�. Reintent�.");
+									window.location.reload();
+									return;
+								}
+								pollTimeout = setTimeout(
+									pollForToken,
+									currentInterval,
+								);
+							} catch (e) {
+								pollTimeout = setTimeout(
+									pollForToken,
+									currentInterval,
+								);
+							}
+						}
+						pollTimeout = setTimeout(pollForToken, currentInterval);
+					} catch (err) {
+						alert("Error al intentar la conexi�n.");
+						btnLogin.disabled = false;
+					}
+				});
+			});
+		</script>
+		<Footer />
+	</body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: historial\index.astro ---
+---
+// src/pages/historial/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+const todasLasAsignacionesViejas = await getCollection("historial");
+
+// [CORRECCI�N] Filtramos para descartar los registros hist�ricos con active: false
+const asignacionesHistoricasVisibles = todasLasAsignacionesViejas.filter(
+    (asig: any) => asig.data.active !== false,
+);
+
+// Helper para formatear la fecha de publicaci�n en el listado hist�rico
+const formatearFecha = (fecha: string | Date) => {
+    if (!fecha) return null;
+    return new Date(fecha).toLocaleDateString("es-AR", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+    });
+};
+---
+
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Historial de Asignaciones - UNAHUR</title>
+        <style>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                background-color: #0b0f19;
+                color: #f1f5f9;
+                margin: 0;
+                padding: 2rem 1rem;
+            }
+            .container {
+                max-width: 850px;
+                margin: 0 auto;
+            }
+            h1 {
+                font-size: 2.4rem;
+                color: #ffffff;
+                margin: 0;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+            }
+            h1 span.naranja {
+                color: #ff9e1b;
+            }
+            h2 {
+                font-size: 1rem;
+                color: #94a3b8;
+                margin: 0;
+                font-weight: 400;
+                opacity: 0.9;
+            }
+
+            .panel-controls {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .btn-active-action {
+                background: rgba(0, 155, 195, 0.07);
+                color: #009bc3;
+                border: 1px solid rgba(0, 155, 195, 0.2);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-decoration: none;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                transition: all 0.2s ease;
+            }
+
+            .btn-active-action:hover {
+                background: #009bc3;
+                color: #0b0f19;
+                border-color: #009bc3;
+            }
+
+            /* --- GRILLA DE MATERIAS --- */
+            .subjects-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+                margin-top: 1rem;
+            }
+            .subject-card {
+                background: #111726;
+                padding: 1.75rem;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                color: #fff;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                transition: all 0.2s ease;
+            }
+            .subject-card:hover {
+                border-color: #ff9e1b;
+                transform: translateY(-2px);
+            }
+
+            .card-body {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+            .card-title {
+                font-weight: 700;
+                font-size: 1.05rem;
+            }
+
+            /* Estilo sutil para la fecha de publicaci�n en el Historial */
+            .card-date {
+                font-size: 0.75rem;
+                color: #64748b;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.02em;
+                border-top: 1px solid rgba(255, 255, 255, 0.03);
+                padding-top: 0.5rem;
+                margin-top: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.5rem;"
+            >
+                <div>
+                    <h1>
+                        Asignaciones <span class="naranja">Hist�ricas</span>
+                    </h1>
+                    <h2>Trabajos pr�cticos y entregas de ciclos anteriores.</h2>
+                </div>
+                <HeaderUni />
+            </header>
+
+            <UserProfile />
+
+            <main>
+                <div class="panel-controls">
+                    <a href="/" class="btn-active-action"> ? Ver Activas </a>
+                </div>
+
+                <div class="subjects-grid">
+                    {
+                        // [CORRECCI�N] Validamos sobre el listado filtrado 'asignacionesHistoricasVisibles'
+                        asignacionesHistoricasVisibles.length === 0 ? (
+                            <p style="color: #64748b; grid-column: 1/-1;">
+                                No hay asignaciones en el historial todav�a.
+                            </p>
+                        ) : (
+                            asignacionesHistoricasVisibles.map((asig: any) => {
+                                const fechaPub = formatearFecha(
+                                    asig.data.fechaPublicacion,
+                                );
+
+                                return (
+                                    <a
+                                        href={`/historial/${asig.slug}`}
+                                        class="subject-card"
+                                    >
+                                        <div class="card-body">
+                                            <span class="card-title">
+                                                {asig.data.title}
+                                            </span>
+                                            <span style="color: #ff9e1b;">
+                                                ?
+                                            </span>
+                                        </div>
+                                        {/* Renderizamos la fecha si el markdown hist�rico dispone de ella */}
+                                        {fechaPub && (
+                                            <span class="card-date">
+                                                Publicado: {fechaPub}
+                                            </span>
+                                        )}
+                                    </a>
+                                );
+                            })
+                        )
+                    }
+                </div>
+            </main>
+        </div>
+
+        <script is:inline>
+            document.addEventListener("DOMContentLoaded", () => {
+                const savedUser = localStorage.getItem("gh_username");
+
+                // Seguridad b�sica: si entra directo sin loguearse, vuelve al home.
+                if (!savedUser) {
+                    window.location.href = "/";
+                }
+            });
+        </script>
+        <Footer />
+    </body>
+</html>
+
+
+================================================================================
+
+--- ARCHIVO: materias\[slug].astro ---
+---
+// src/pages/materias/[...slug].astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	
+	// Filtramos las materias ra�z (las que no son asignaciones ni historial)
+	const raicesMaterias = todoElContenido.filter(
+		(item) => !item.slug.includes("/asignaciones/") && !item.slug.includes("/historial/")
+	);
+
+	return raicesMaterias.map((mat) => ({
+		params: { slug: mat.slug }, // -> "materia-template/obj1-2026c1"
+		props: { mat },
+	}));
+}
+
+const { slug } = Astro.params; 
+const { mat } = Astro.props;
+
+// "materia-template/obj1-2026c1" -> ["materia-template", "obj1-2026c1"]
+const partesSlug = slug.split("/");
+const carpetaMateria = partesSlug[0]; // -> "materia-template"
+
+const todoElContenido = await getCollection("materias");
+
+// Filtramos asignaciones que pertenezcan a la carpeta de esta materia
+const asignacionesFiltradas = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === carpetaMateria && partes[1] === "asignaciones" && item.data.active !== false;
+});
+
+// Filtramos historial que pertenezca a la carpeta de esta materia
+const historialFiltrado = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === carpetaMateria && partes[1] === "historial" && item.data.active !== false;
+});
+
+const formatearFecha = (fecha: string | Date) => {
+	if (!fecha) return null;
+	return new Date(fecha).toLocaleDateString("es-AR", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+};
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{mat.data.title || "Materia"} - UNAHUR</title>
+		<style>
+			body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.back-link { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-block; }
+			.back-link:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; }
+			.section-title { font-size: 1.25rem; color: #ff9e1b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+			.asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+			.asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.2s; }
+			.asig-card:hover { border-color: #70b043; transform: translateY(-2px); }
+			.asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+			.asig-date { font-size: 0.75rem; color: #64748b; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{mat.data.title}</h1></HeaderUni>
+			<UserProfile />
+			<div class="nav-box"><a href="/" class="back-link">? Volver al inicio</a></div>
+
+			<main>
+				<h2 class="section-title">Asignaciones Activas</h2>
+				<div class="asig-grid">
+					{asignacionesFiltradas.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay asignaciones publicadas para esta cursada todav�a.</p>
+					) : (
+						asignacionesFiltradas.map((asig) => {
+							const fechaPub = formatearFecha(asig.data.fechaPublicacion);
+							const archivoSlug = asig.slug.split("/").pop();
+							
+							// CORRECCI�N DE LA URL:
+							// Usamos 'carpetaMateria' para que la URL sea /materias/materia-template/asignaciones/tp-nombre
+							// Esto engancha perfecto con tu archivo [materia]/[coleccion]/[slug].astro
+							return (
+								<a href={`/materias/${carpetaMateria}/asignaciones/${archivoSlug}`} class="asig-card">
+									<div class="asig-title-row">
+										<span>{asig.data.title}</span>
+										<span style="color: #70b043;">?</span>
+									</div>
+									{fechaPub && <span class="asig-date">Publicado: {fechaPub}</span>}
+								</a>
+							);
+						})
+					)}
+				</div>
+
+				<h2 class="section-title" style="color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 3rem; padding-top: 2rem;">Historial de Entregas</h2>
+				<div class="asig-grid">
+					{historialFiltrado.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay registros hist�ricos guardados.</p>
+					) : (
+						historialFiltrado.map((h) => {
+							const archivoSlug = h.slug.split("/").pop();
+							return (
+								<a href={`/materias/${carpetaMateria}/historial/${archivoSlug}`} class="asig-card" style="opacity: 0.6;">
+									<div class="asig-title-row">
+										<span>{h.data.title}</span>
+										<span style="color: #009bc3;">?</span>
+									</div>
+								</a>
+							);
+						})
+					)}
+				</div>
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: materias\[materia]\asignaciones\index.astro ---
+---
+// src/pages/materias/[materia]/asignaciones/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	// Extraemos los nombres �nicos del primer nivel de carpetas (ej: "materia-template")
+	const carpetasUnicas = [...new Set(todoElContenido.map(item => item.slug.split("/")[0]))];
+	
+	return carpetasUnicas.map(materia => ({
+		params: { materia }
+	}));
+}
+
+const { materia } = Astro.params;
+
+const todoElContenido = await getCollection("materias");
+
+// Intentamos buscar el t�tulo leyendo el md de la materia
+const infoMateria = todoElContenido.find(item => item.slug.startsWith(materia + "/") && item.slug.split("/").length === 2);
+const nombreMateria = infoMateria ? infoMateria.data.title : materia;
+
+// Filtramos solo los elementos bajo: materia-template/asignaciones/*
+const asignacionesActivas = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === materia && partes[1] === "asignaciones" && item.data.active !== false;
+});
+
+const formatearFecha = (fecha: string | Date) => {
+	if (!fecha) return null;
+	return new Date(fecha).toLocaleDateString("es-AR", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+};
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Asignaciones - {nombreMateria}</title>
+		<style>
+			body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; display: flex; justify-content: space-between; align-items: center; }
+			.link-azul { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+			.link-azul:hover { color: #70b043; }
+			.btn-historial { background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+			.btn-historial:hover { border-color: #ff9e1b; color: #fff; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; }
+			.section-title { font-size: 1.25rem; color: #ff9e1b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+			.asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+			.asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.2s; }
+			.asig-card:hover { border-color: #70b043; transform: translateY(-2px); }
+			.asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+			.asig-date { font-size: 0.75rem; color: #64748b; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{nombreMateria}</h1></HeaderUni>
+			<UserProfile />
+			
+			<div class="nav-box">
+				<a href="/" class="link-azul">? Volver al inicio</a>
+				<a href={`/materias/${materia}/historial/index`} class="btn-historial">Ver Historial de Entregas ?</a>
+			</div>
+
+			<main>
+				<h2 class="section-title">Asignaciones Activas</h2>
+				<div class="asig-grid">
+					{asignacionesActivas.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay asignaciones publicadas para esta cursada todav�a.</p>
+					) : (
+						asignacionesActivas.map((asig) => {
+							const fechaPub = formatearFecha(asig.data.fechaPublicacion);
+							const archivoSlug = asig.slug.split("/").pop();
+							return (
+								<a href={`/materias/${materia}/asignaciones/${archivoSlug}`} class="asig-card">
+									<div class="asig-title-row">
+										<span>{asig.data.title}</span>
+										<span style="color: #70b043;">?</span>
+									</div>
+									{fechaPub && <span class="asig-date">Publicado: {fechaPub}</span>}
+								</a>
+							);
+						})
+					)}
+				</div>
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: materias\[materia]\historial\index.astro ---
+---
+// src/pages/materias/[materia]/historial/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+	const carpetasUnicas = [...new Set(todoElContenido.map(item => item.slug.split("/")[0]))];
+	return carpetasUnicas.map(materia => ({ params: { materia } }));
+}
+
+const { materia } = Astro.params;
+
+const todoElContenido = await getCollection("materias");
+const infoMateria = todoElContenido.find(item => item.slug.startsWith(materia + "/") && item.slug.split("/").length === 2);
+const nombreMateria = infoMateria ? infoMateria.data.title : materia;
+
+// Filtramos solo los elementos bajo: materia-template/historial/*
+const historialFiltrado = todoElContenido.filter((item) => {
+	const partes = item.slug.split("/");
+	return partes[0] === materia && partes[1] === "historial" && item.data.active !== false;
+});
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Historial - {nombreMateria}</title>
+		<style>
+			body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.link-azul { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+			.link-azul:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; }
+			.section-title { font-size: 1.25rem; color: #64748b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+			.asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+			.asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; opacity: 0.75; transition: all 0.2s; }
+			.asig-card:hover { border-color: #ff9e1b; opacity: 1; transform: translateY(-2px); }
+			.asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>Historial: {nombreMateria}</h1></HeaderUni>
+			<UserProfile />
+
+			<main>
+				<h2 class="section-title">Asignaciones Pasadas</h2>
+				<div class="asig-grid">
+					{historialFiltrado.length === 0 ? (
+						<p style="color: #64748b; font-style: italic;">No hay registros hist�ricos en esta materia.</p>
+					) : (
+						historialFiltrado.map((h) => {
+							const archivoSlug = h.slug.split("/").pop();
+							return (
+								<a href={`/materias/${materia}/historial/${archivoSlug}`} class="asig-card">
+									<div class="asig-title-row">
+										<span>{h.data.title}</span>
+										<span style="color: #ff9e1b;">?</span>
+									</div>
+								</a>
+							);
+						})
+					)}
+				</div>
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: materias\[materia]\[coleccion]\[slug].astro ---
+---
+// src/pages/materias/[materia]/[coleccion]/[slug].astro
+import { getCollection } from "astro:content";
+import ModalesClonador from "@components/ModalesClonador.astro";
+import ScriptClonador from "@components/ScriptClonador.astro";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+
+	// Filtramos solo archivos que tengan estructura completa de subcarpetas (longitud 3 al hacer split)
+	const itemsInternos = todoElContenido.filter(item => item.slug.split("/").length === 3);
+
+	return itemsInternos.map((item) => {
+		const [materiaFolder, coleccionFolder, archivoSlug] = item.slug.split("/");
+
+		return {
+			params: {
+				materia: materiaFolder,      // -> "materia-template"
+				coleccion: coleccionFolder,  // -> "asignaciones" o "historial"
+				slug: archivoSlug,           // -> "parcial2_2026C1"
+			},
+			props: { asig: item },
+		};
+	});
+}
+
+const { materia, coleccion } = Astro.params;
+const { asig } = Astro.props;
+const { title, ejercicios } = asig.data;
+
+// Buscamos din�micamente cu�l es el archivo ra�z de la materia para saber el slug original de retorno
+const todoElContenido = await getCollection("materias");
+const raizMateria = todoElContenido.find(
+	(item) => item.slug.startsWith(materia + "/") && item.slug.split("/").length === 2
+);
+const backSlug = raizMateria ? raizMateria.slug : `${materia}`;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title} - UNAHUR</title>
+		<style>
+			body { font-family: system-ui, -apple-system, sans-serif; background-color: #0b0f19; color: #f1f5f9; margin: 0; padding: 2rem 1rem; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.back-link { display: inline-flex; align-items: center; gap: 6px; color: #009bc3; text-decoration: none; font-weight: 600; transition: color 0.2s; font-size: 0.9rem; }
+			.back-link:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; letter-spacing: -0.02em; text-align: left; }
+			.exercises-stack { display: flex; flex-direction: column; gap: 2rem; }
+			.ex-card { background: #111726; border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.25rem; border-radius: 16px; position: relative; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3); overflow: hidden; }
+			.ex-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #70b043; }
+			.badge-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+			.badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+			.badge-group { background: rgba(0, 155, 195, 0.15); color: #009bc3; border: 1px solid rgba(0, 155, 195, 0.3); }
+			.badge-required { background: rgba(243, 146, 0, 0.15); color: #f39200; border: 1px solid rgba(243, 146, 0, 0.3); }
+			h3 { margin: 0 0 1rem 0; font-size: 1.4rem; color: #ffffff; font-weight: 700; }
+			.comment-box { background: #070a12; border-left: 3px solid #1e293b; padding: 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0 1.75rem 0; }
+			.comment-box p { margin: 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+			.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+			.btn-accept { background: #f39200; color: #04060a; font-weight: 700; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-size: 1rem; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(243, 146, 0, 0.15); }
+			.btn-accept:not(:disabled):hover { background: #ffaa2b; box-shadow: 0 6px 20px rgba(243, 146, 0, 0.3); transform: translateY(-1px); }
+			.btn-accept:disabled { background: #1e293b; color: #64748b; box-shadow: none; cursor: not-allowed; }
+			.btn-consigna { display: flex; align-items: center; justify-content: center; background: transparent; color: #ffffff; border: 2px solid #1e293b; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: all 0.2s ease; }
+			.btn-consigna:hover { background: rgba(255, 255, 255, 0.03); border-color: #cbd5e1; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{title}</h1></HeaderUni>
+			<UserProfile />
+
+			<div class="nav-box">
+				<a href={`/materias/${backSlug}`} class="back-link">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+					Volver a la materia
+				</a>
+			</div>
+
+			<main class="exercises-stack">
+				{
+					ejercicios &&
+						ejercicios.map((ej: any) => {
+							const partes = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "").split("/") : [];
+							const templateOrg = partes[0] ?? "";
+							const template = (partes[1] ?? "").split("?")[0] ?? "";
+							const repoUrl = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "") : "";
+							const destOrg = ej.destOrg || templateOrg;
+							const prefix = ej.prefix || template;
+							const isPrivate = ej.obligatorio || ej.isPrivate ? "true" : "false";
+
+							return (
+								<div class="ex-card">
+									<div class="badge-row">
+										{ej.obligatorio && <span class="badge badge-required">Obligatorio</span>}
+										{ej.type === "group" && <span class="badge badge-group">Grupal</span>}
+									</div>
+
+									<h3>{ej.name}</h3>
+
+									{ej.comentarios && ej.comentarios.map((c: any) => (
+										<div class="comment-box"><p>{c.name}</p></div>
+									))}
+
+									<div class="actions-grid">
+										<button
+											type="button"
+											class="btn-accept aceptar-invitacion"
+											data-template={template}
+											data-template-org={templateOrg}
+											data-template-repo={template}
+											data-dest-org={destOrg}
+											data-prefix={prefix}
+											data-private={isPrivate}
+											data-type={ej.type || "individual"}
+											data-require-totp={ej.requireTOTP ? "true" : "false"}
+										>
+											Aceptar asignaci�n
+										</button>
+										<a href={`https://github.com/${repoUrl}`} target="_blank" rel="noreferrer" class="btn-consigna">
+											Ver Consigna
+										</a>
+									</div>
+								</div>
+							);
+						})
+				}
+			</main>
+		</div>
+
+		<ModalesClonador />
+		<ScriptClonador />
+
+		<script is:inline>
+			document.addEventListener("DOMContentLoaded", () => {
+				const savedUser = localStorage.getItem("gh_username");
+				if (!savedUser) { window.location.href = "/"; return; }
+				
+				const displayUsername = document.getElementById("display-username");
+				const displayAvatar = document.getElementById("display-avatar");
+				const authUserBar = document.getElementById("auth-user-bar");
+				if (displayUsername) displayUsername.textContent = `@${savedUser}`;
+				if (displayAvatar) displayAvatar.src = `https://github.com/${savedUser}.png`;
+				if (authUserBar) authUserBar.style.display = "flex";
+
+				document.getElementById("btn-logout-gh")?.addEventListener("click", () => {
+					localStorage.removeItem("gh_username");
+					localStorage.removeItem("gh_token");
+					window.location.href = "/";
+				});
+			});
+		</script>
+		<Footer />
+	</body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: [materia]\index.astro ---
+---
+// src/pages/[materia]/index.astro
+import { getCollection } from "astro:content";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+    const todoElContenido = await getCollection("materias");
+
+    // Obtenemos una lista �nica de los nombres de las carpetas de las materias
+    // Haciendo split("/") de "obj1/asignaciones/tp1", el primer elemento [0] es "obj1"
+    const todasLasMaterias = [
+        ...new Set(todoElContenido.map((item) => item.slug.split("/")[0])),
+    ];
+
+    return todasLasMaterias.map((materiaNombre) => {
+        return {
+            params: { materia: materiaNombre },
+        };
+    });
+}
+
+const { materia } = Astro.params;
+
+// Buscamos todo el contenido que pertenezca a esta materia en particular
+const todoElContenido = await getCollection("materias");
+
+// Filtrar asignaciones activas de esta materia (ej: "obj1/asignaciones/...")
+const asignacionesFiltradas = todoElContenido.filter((item) => {
+    const partes = item.slug.split("/");
+    return partes[0] === materia && partes[1] === "asignaciones" && item.data.active !== false;
+});
+
+// Filtrar historial de esta materia (ej: "obj1/historial/...")
+const historialFiltrado = todoElContenido.filter((item) => {
+    const partes = item.slug.split("/");
+    return partes[0] === materia && partes[1] === "historial" && item.data.active !== false;
+});
+
+const formatearFecha = (fecha: string | Date) => {
+    if (!fecha) return null;
+    return new Date(fecha).toLocaleDateString("es-AR", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+    });
+};
+---
+
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{materia.toUpperCase()} - UNAHUR</title>
+        <style>
+            body { font-family: system-ui, sans-serif; background-color: #0b0f19; color: #f1f5f9; padding: 2rem 1rem; margin: 0; }
+            .container { max-width: 850px; margin: 0 auto; }
+            .nav-box { margin: 1rem 0 2rem 0; }
+            .back-link { color: #009bc3; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+            .back-link:hover { color: #70b043; }
+            h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; text-transform: uppercase; }
+            .section-title { font-size: 1.25rem; color: #ff9e1b; margin: 2rem 0 1rem 0; font-weight: 700; text-transform: uppercase; }
+            .asig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+            .asig-card { background: #111726; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); color: #fff; text-decoration: none; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.2s; }
+            .asig-card:hover { border-color: #70b043; transform: translateY(-2px); }
+            .asig-title-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+            .asig-date { font-size: 0.75rem; color: #64748b; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.02); }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <HeaderUni><h1>{materia}</h1></HeaderUni>
+            <UserProfile />
+            <div class="nav-box"><a href="/" class="back-link">? Volver al inicio</a></div>
+
+            <main>
+                <h2 class="section-title">Asignaciones Activas</h2>
+                <div class="asig-grid">
+                    {asignacionesFiltradas.length === 0 ? (
+                        <p style="color: #64748b; font-style: italic;">No hay asignaciones publicadas para esta cursada todav�a.</p>
+                    ) : (
+                        asignacionesFiltradas.map((asig) => {
+                            const fechaPub = formatearFecha(asig.data.fechaPublicacion);
+                            // Tomamos el �ltimo fragmento del slug (ej: "tp1")
+                            const archivoSlug = asig.slug.split("/").pop();
+                            return (
+                                <a href={`/${materia}/asignaciones/${archivoSlug}`} class="asig-card">
+                                    <div class="asig-title-row">
+                                        <span>{asig.data.title}</span>
+                                        <span style="color: #70b043;">?</span>
+                                    </div>
+                                    {fechaPub && <span class="asig-date">Publicado: {fechaPub}</span>}
+                                </a>
+                            );
+                        })
+                    )}
+                </div>
+
+                <h2 class="section-title" style="color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 3rem; padding-top: 2rem;">Historial de Entregas</h2>
+                <div class="asig-grid">
+                    {historialFiltrado.length === 0 ? (
+                        <p style="color: #64748b; font-style: italic;">No hay registros hist�ricos guardados.</p>
+                    ) : (
+                        historialFiltrado.map((h) => {
+                            const archivoSlug = h.slug.split("/").pop();
+                            return (
+                                <a href={`/${materia}/historial/${archivoSlug}`} class="asig-card" style="opacity: 0.6;">
+                                    <div class="asig-title-row">
+                                        <span>{h.data.title}</span>
+                                        <span style="color: #009bc3;">?</span>
+                                    </div>
+                                </a>
+                            );
+						})
+                    )}
+                </div>
+            </main>
+            <Footer />
+        </div>
+    </body>
+</html>
+
+================================================================================
+
+--- ARCHIVO: [materia]\[coleccion]\[slug].astro ---
+---
+// src/pages/materias/[materia]/[coleccion]/[slug].astro
+import { getCollection } from "astro:content";
+import ModalesClonador from "@components/ModalesClonador.astro";
+import ScriptClonador from "@components/ScriptClonador.astro";
+import HeaderUni from "@components/HeaderUni.astro";
+import UserProfile from "@components/UserProfile.astro";
+import Footer from "@components/Footer.astro";
+
+export async function getStaticPaths() {
+	const todoElContenido = await getCollection("materias");
+
+	// Filtramos solo archivos que tengan estructura completa de subcarpetas (longitud 3 al hacer split)
+	const itemsInternos = todoElContenido.filter(item => item.slug.split("/").length === 3);
+
+	return itemsInternos.map((item) => {
+		const [materiaFolder, coleccionFolder, archivoSlug] = item.slug.split("/");
+
+		return {
+			params: {
+				materia: materiaFolder,      // -> "materia-template"
+				coleccion: coleccionFolder,  // -> "asignaciones" o "historial"
+				slug: archivoSlug,           // -> "parcial2_2026C1"
+			},
+			props: { asig: item },
+		};
+	});
+}
+
+const { materia, coleccion } = Astro.params;
+const { asig } = Astro.props;
+const { title, ejercicios } = asig.data;
+
+// Buscamos din�micamente cu�l es el archivo ra�z de la materia para saber el slug original de retorno
+const todoElContenido = await getCollection("materias");
+const raizMateria = todoElContenido.find(
+	(item) => item.slug.startsWith(materia + "/") && item.slug.split("/").length === 2
+);
+const backSlug = raizMateria ? raizMateria.slug : `${materia}`;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title} - UNAHUR</title>
+		<style>
+			body { font-family: system-ui, -apple-system, sans-serif; background-color: #0b0f19; color: #f1f5f9; margin: 0; padding: 2rem 1rem; }
+			.container { max-width: 850px; margin: 0 auto; }
+			.nav-box { margin: 1rem 0 2rem 0; }
+			.back-link { display: inline-flex; align-items: center; gap: 6px; color: #009bc3; text-decoration: none; font-weight: 600; transition: color 0.2s; font-size: 0.9rem; }
+			.back-link:hover { color: #70b043; }
+			h1 { font-size: 2rem; color: #ffffff; margin: 0; font-weight: 800; letter-spacing: -0.02em; text-align: left; }
+			.exercises-stack { display: flex; flex-direction: column; gap: 2rem; }
+			.ex-card { background: #111726; border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.25rem; border-radius: 16px; position: relative; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3); overflow: hidden; }
+			.ex-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #70b043; }
+			.badge-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+			.badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+			.badge-group { background: rgba(0, 155, 195, 0.15); color: #009bc3; border: 1px solid rgba(0, 155, 195, 0.3); }
+			.badge-required { background: rgba(243, 146, 0, 0.15); color: #f39200; border: 1px solid rgba(243, 146, 0, 0.3); }
+			h3 { margin: 0 0 1rem 0; font-size: 1.4rem; color: #ffffff; font-weight: 700; }
+			.comment-box { background: #070a12; border-left: 3px solid #1e293b; padding: 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0 1.75rem 0; }
+			.comment-box p { margin: 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+			.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+			.btn-accept { background: #f39200; color: #04060a; font-weight: 700; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-size: 1rem; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(243, 146, 0, 0.15); }
+			.btn-accept:not(:disabled):hover { background: #ffaa2b; box-shadow: 0 6px 20px rgba(243, 146, 0, 0.3); transform: translateY(-1px); }
+			.btn-accept:disabled { background: #1e293b; color: #64748b; box-shadow: none; cursor: not-allowed; }
+			.btn-consigna { display: flex; align-items: center; justify-content: center; background: transparent; color: #ffffff; border: 2px solid #1e293b; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: all 0.2s ease; }
+			.btn-consigna:hover { background: rgba(255, 255, 255, 0.03); border-color: #cbd5e1; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<HeaderUni><h1>{title}</h1></HeaderUni>
+			<UserProfile />
+
+			<div class="nav-box">
+				<a href={`/materias/${backSlug}`} class="back-link">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+					Volver a la materia
+				</a>
+			</div>
+
+			<main class="exercises-stack">
+				{
+					ejercicios &&
+						ejercicios.map((ej: any) => {
+							const partes = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "").split("/") : [];
+							const templateOrg = partes[0] ?? "";
+							const template = (partes[1] ?? "").split("?")[0] ?? "";
+							const repoUrl = ej.urlTemplate ? ej.urlTemplate.replace("https://github.com/", "") : "";
+							const destOrg = ej.destOrg || templateOrg;
+							const prefix = ej.prefix || template;
+							const isPrivate = ej.obligatorio || ej.isPrivate ? "true" : "false";
+
+							return (
+								<div class="ex-card">
+									<div class="badge-row">
+										{ej.obligatorio && <span class="badge badge-required">Obligatorio</span>}
+										{ej.type === "group" && <span class="badge badge-group">Grupal</span>}
+									</div>
+
+									<h3>{ej.name}</h3>
+
+									{ej.comentarios && ej.comentarios.map((c: any) => (
+										<div class="comment-box"><p>{c.name}</p></div>
+									))}
+
+									<div class="actions-grid">
+										<button
+											type="button"
+											class="btn-accept aceptar-invitacion"
+											data-template={template}
+											data-template-org={templateOrg}
+											data-template-repo={template}
+											data-dest-org={destOrg}
+											data-prefix={prefix}
+											data-private={isPrivate}
+											data-type={ej.type || "individual"}
+											data-require-totp={ej.requireTOTP ? "true" : "false"}
+										>
+											Aceptar asignaci�n
+										</button>
+										<a href={`https://github.com/${repoUrl}`} target="_blank" rel="noreferrer" class="btn-consigna">
+											Ver Consigna
+										</a>
+									</div>
+								</div>
+							);
+						})
+				}
+			</main>
+		</div>
+
+		<ModalesClonador />
+		<ScriptClonador />
+
+		<script is:inline>
+			document.addEventListener("DOMContentLoaded", () => {
+				const savedUser = localStorage.getItem("gh_username");
+				if (!savedUser) { window.location.href = "/"; return; }
+				
+				const displayUsername = document.getElementById("display-username");
+				const displayAvatar = document.getElementById("display-avatar");
+				const authUserBar = document.getElementById("auth-user-bar");
+				if (displayUsername) displayUsername.textContent = `@${savedUser}`;
+				if (displayAvatar) displayAvatar.src = `https://github.com/${savedUser}.png`;
+				if (authUserBar) authUserBar.style.display = "flex";
+
+				document.getElementById("btn-logout-gh")?.addEventListener("click", () => {
+					localStorage.removeItem("gh_username");
+					localStorage.removeItem("gh_token");
+					window.location.href = "/";
+				});
+			});
+		</script>
+		<Footer />
+	</body>
+</html>
+
+================================================================================
+
