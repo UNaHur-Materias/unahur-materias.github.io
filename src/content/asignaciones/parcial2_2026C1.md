@@ -2,7 +2,7 @@
 title: "2do Parcial de Programación con objetos 2"
 description: "Parcial grupal asincrónico"
 fechaPublicacion: 2026-06-25
-active: true
+active: false
 
 ejercicios:
   - name: "🚚 Hermes: Logística Global 📦 (Comisión 1)"
@@ -26,5 +26,3 @@ ejercicios:
       - name: "2do parcial para la comisión 2."
     
 ---
-
-- A ver si sube este texto
