@@ -7,7 +7,7 @@ active: false
 ejercicios:
   - name: "☕ Sistema de Reservas y Procesamiento de Pedidos de una Cafetería (Comisión 4)"
     urlTemplate: "https://github.com/unahur-obj2/cafeteria"
-    destOrg: "unahur-obj2-2026c2"
+    destOrg: "unahur-obj2-2026c1"
     type: "individual" #group
     obligatorio: true
     prefix: "parcial1Com4_2026C2"

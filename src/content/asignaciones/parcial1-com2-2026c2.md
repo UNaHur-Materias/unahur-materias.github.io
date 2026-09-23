@@ -7,7 +7,7 @@ active: false
 ejercicios:
   - name: "🎟️ Plataforma de Reservas de Entradas para Espectáculos (Comisión 2)"
     urlTemplate: "https://github.com/unahur-obj2/eventos"
-    destOrg: "unahur-obj2-2026c2"
+    destOrg: "unahur-obj2-2026c1"
     type: "individual" #group
     obligatorio: true
     prefix: "parcial1Com2_2026C2"
