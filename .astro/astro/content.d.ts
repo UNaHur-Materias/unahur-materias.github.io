@@ -151,16 +151,30 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"asignaciones": {
-"parcial2_2026c1.md": {
-	id: "parcial2_2026c1.md";
-  slug: "parcial2_2026c1";
+"parcial1-com1-2026c2.md": {
+	id: "parcial1-com1-2026c2.md";
+  slug: "parcial1-com1-2026c2";
   body: string;
   collection: "asignaciones";
   data: any
 } & { render(): Render[".md"] };
-"recu1y2_2026c1.md": {
-	id: "recu1y2_2026c1.md";
-  slug: "recu1y2_2026c1";
+"parcial1-com2-2026c2.md": {
+	id: "parcial1-com2-2026c2.md";
+  slug: "parcial1-com2-2026c2";
+  body: string;
+  collection: "asignaciones";
+  data: any
+} & { render(): Render[".md"] };
+"parcial1-com3-2026c2.md": {
+	id: "parcial1-com3-2026c2.md";
+  slug: "parcial1-com3-2026c2";
+  body: string;
+  collection: "asignaciones";
+  data: any
+} & { render(): Render[".md"] };
+"parcial1-com4-2026c2.md": {
+	id: "parcial1-com4-2026c2.md";
+  slug: "parcial1-com4-2026c2";
   body: string;
   collection: "asignaciones";
   data: any
@@ -170,6 +184,20 @@ declare module 'astro:content' {
 "command.md": {
 	id: "command.md";
   slug: "command";
+  body: string;
+  collection: "historial";
+  data: any
+} & { render(): Render[".md"] };
+"parcial2_2026c1.md": {
+	id: "parcial2_2026c1.md";
+  slug: "parcial2_2026c1";
+  body: string;
+  collection: "historial";
+  data: any
+} & { render(): Render[".md"] };
+"recu1y2_2026c1.md": {
+	id: "recu1y2_2026c1.md";
+  slug: "recu1y2_2026c1";
   body: string;
   collection: "historial";
   data: any

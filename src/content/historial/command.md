@@ -2,11 +2,19 @@
 title: Patrones Command y Observer
 description: Ejercicio de practica para el patrón Command
 fechaPublicacion: 2026-06-15
-active: true
+active: false
 
 ejercicios:
+  - name: 🧾 Subastas online
+    urlTemplate: https://github.com/unahur-obj2-2026c2/subastas
+    destOrg: unahur-obj2-2026c1
+    type: individual
+    obligatorio: true
+    comentarios:
+      - name: Ejercicio integrador tipo 2do parcial para practicar Observer
+
   - name: ☕ Máquina de Café Inteligente
-    urlTemplate: https://github.com/unahur-obj2-2026c1/maquina-cafe
+    urlTemplate: https://github.com/unahur-obj2-2026c2/maquina-cafe
     destOrg: unahur-obj2-2026c1
     type: individual #group
     obligatorio: true
@@ -14,10 +22,5 @@ ejercicios:
     comentarios:
       - name: Ejercicio integrador tipo 2do parcial para practicar Command.
 
-  - name: 🧾 Subastas online
-    urlTemplate: https://github.com/unahur-obj2-2026c1/subastas
-    destOrg: unahur-obj2-2026c1
-    type: individual
-    comentarios:
-      - name: Ejercicio integrador tipo 2do parcial para practicar Observer
+  
 ---
