@@ -2,7 +2,7 @@
 title: Patrones Command y Observer
 description: Ejercicio de practica para el patrón Command
 fechaPublicacion: 2026-06-15
-active: false
+active: true
 
 ejercicios:
   - name: 🧾 Subastas online
