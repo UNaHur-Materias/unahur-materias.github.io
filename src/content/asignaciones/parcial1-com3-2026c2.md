@@ -10,7 +10,7 @@ ejercicios:
     destOrg: "unahur-obj2-2026c1"
     type: "individual" #group
     obligatorio: true
-    prefix: "parcial1Com3_2026C2"
+    prefix: "p1-com3-2026c2"
     fechaDeEntrega: "Límite de entrega hasta el 25/09 a las 21.30"
     comentarios:
       - name: "1er parcial para la comisión 3."   
