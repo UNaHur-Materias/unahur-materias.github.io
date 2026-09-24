@@ -2,7 +2,7 @@
 title: "Comisión 1 - 1er Parcial de Programación con objetos 2"
 description: "Parcial individual sincrónico"
 fechaPublicacion: 2026-09-24
-active: true
+active: false
 
 ejercicios:
   - name: "🎟️ Plataforma de Reservas de Entradas para Espectáculos (Comisión 1)"
