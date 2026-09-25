@@ -2,7 +2,7 @@
 title: "Comisión 4 - 1er Parcial de Programación con objetos 2"
 description: "Parcial individual sincrónico"
 fechaPublicacion: 2026-09-25
-active: false
+active: true
 
 ejercicios:
   - name: "☕ Sistema de Reservas y Procesamiento de Pedidos de una Cafetería (Comisión 4)"
