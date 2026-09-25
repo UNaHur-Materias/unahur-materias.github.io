@@ -2,7 +2,7 @@
 title: "Comisión 3 - 1er Parcial de Programación con objetos 2"
 description: "Parcial individual sincrónico"
 fechaPublicacion: 2026-09-25
-active: true
+active: false
 
 ejercicios:
   - name: "☕ Sistema de Reservas y Procesamiento de Pedidos de una Cafetería (Comisión 3)"
